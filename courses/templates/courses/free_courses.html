@@ -1,0 +1,98 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Free Courses - TradingPro Academy{% endblock %}
+
+{% block extra_css %}
+<style>
+    .course-card {
+        border: none;
+        box-shadow: 0 0 20px rgba(0, 0, 0, 0.1);
+        border-radius: 10px;
+        overflow: hidden;
+        transition: transform 0.3s ease;
+    }
+    .course-card:hover {
+        transform: translateY(-5px);
+    }
+    .course-card img {
+        width: 100%;
+        height: 200px;
+        object-fit: cover;
+    }
+    .course-card .card-body {
+        padding: 20px;
+    }
+    .course-card .card-title {
+        font-size: 1.25rem;
+        font-weight: 600;
+        margin-bottom: 10px;
+    }
+    .course-card .card-text {
+        color: #6c757d;
+        margin-bottom: 15px;
+    }
+    .course-meta {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 15px;
+    }
+    .course-meta span {
+        font-size: 0.9rem;
+        color: #6c757d;
+    }
+    .btn-start {
+        background-color: #28a745;
+        border-color: #28a745;
+        color: white;
+        width: 100%;
+    }
+    .btn-start:hover {
+        background-color: #218838;
+        border-color: #218838;
+    }
+    @media (max-width: 767.98px) {
+        .course-card img {
+            height: 150px;
+        }
+        .course-card .card-title {
+            font-size: 1.1rem;
+        }
+        .course-meta span {
+            font-size: 0.8rem;
+        }
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<section class="py-5">
+    <div class="container">
+        <h1 class="display-5 fw-bold mb-4">Free Courses</h1>
+        <p class="lead mb-5">Explore our free courses and start learning today! No payment required.</p>
+        <div class="row">
+            {% for course in courses %}
+            <div class="col-lg-4 col-md-6 mb-4">
+                <div class="course-card">
+                    <img src="{{ course.thumbnail.url|default:'/static/images/default-course.jpg' }}" alt="{{ course.title }} Thumbnail">
+                    <div class="card-body">
+                        <h5 class="card-title">{{ course.title }}</h5>
+                        <p class="card-text">{{ course.description|truncatewords:20 }}</p>
+                        <div class="course-meta">
+                            <span><i class="fas fa-clock me-1"></i> {{ course.duration }}</span>
+                            <span><i class="fas fa-users me-1"></i> {{ course.enrollments.count }} students</span>
+                        </div>
+                        <a href="{% url 'course_detail' course.id %}" class="btn btn-start">Start Course</a>
+                    </div>
+                </div>
+            </div>
+            {% empty %}
+            <div class="col-12 text-center">
+                <p class="lead">No free courses available at the moment. Check back later!</p>
+            </div>
+            {% endfor %}
+        </div>
+    </div>
+</section>
+{% endblock %}

@@ -1,0 +1,12 @@
+{% extends 'base.html' %}
+
+{% block title %}Not Enrolled - TradingPro Academy{% endblock %}
+
+{% block content %}
+<div class="container mt-5 text-center">
+    <h2>Not Enrolled</h2>
+    <p>You are not enrolled in the course: <strong>{{ course.title }}</strong>.</p>
+    <p>Please enroll in the course to access its content.</p>
+    <a href="{% url 'my_courses' %}" class="btn btn-primary">Go to My Courses</a>
+</div>
+{% endblock %}

@@ -1,0 +1,443 @@
+<!-- accounts/templates/accounts/profile.html -->
+{% extends 'base.html' %}
+{% load crispy_forms_tags %}
+{% load static %}
+
+{% block title %}Profile - TradingPro Academy{% endblock %}
+
+{% block extra_css %}
+<style>
+    .profile-hero {
+        background: linear-gradient(rgba(0, 0, 0, 0.7), rgba(0, 0, 0, 0.7)), url('{% static "images/profile-bg.jpg" %}');
+        background-size: cover;
+        background-position: center;
+        color: white;
+        padding: 60px 0;
+        border-radius: 10px 10px 0 0;
+        text-align: center;
+        margin-bottom: 30px;
+    }
+    .profile-pic {
+        width: 150px;
+        height: 150px;
+        object-fit: cover;
+        border: 5px solid white;
+        box-shadow: 0 0 15px rgba(0, 0, 0, 0.3);
+    }
+    .membership-badge {
+        font-size: 0.9rem;
+        padding: 5px 10px;
+    }
+    .card {
+        border: none;
+        box-shadow: 0 0 20px rgba(0, 0, 0, 0.1);
+        border-radius: 10px;
+        transition: transform 0.3s;
+    }
+    .card:hover {
+        transform: translateY(-5px);
+    }
+    .card-header {
+        border-radius: 10px 10px 0 0;
+        cursor: pointer;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+    }
+    .card-header .toggle-icon {
+        transition: transform 0.3s;
+    }
+    .card-header .toggle-icon.collapsed {
+        transform: rotate(0deg);
+    }
+    .card-header .toggle-icon:not(.collapsed) {
+        transform: rotate(180deg);
+    }
+    .course-card, .certificate-card, .activity-card {
+        padding: 15px;
+        margin-bottom: 15px;
+        border-radius: 8px;
+    }
+    .course-card {
+        display: flex;
+        align-items: center;
+        background-color: #f8f9fa;
+    }
+    .course-card img {
+        width: 60px;
+        height: 60px;
+        object-fit: cover;
+        border-radius: 5px;
+        margin-right: 15px;
+    }
+    .certificate-card {
+        background-color: #e9ecef;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+    }
+    .certificate-card .btn {
+        font-size: 0.9rem;
+    }
+    .certificate-card .source-badge {
+        font-size: 0.8rem;
+        margin-left: 5px;
+    }
+    .activity-card {
+        background-color: #f1f3f5;
+        border-left: 4px solid #0d6efd;
+    }
+    .progress-bar {
+        transition: width 0.3s ease-in-out;
+    }
+    .share-btn {
+        background-color: #0d6efd;
+        border-color: #0d6efd;
+    }
+    .share-btn:hover {
+        background-color: #0056b3;
+        border-color: #0056b3;
+    }
+    .social-links a {
+        color: #0d6efd;
+        font-size: 1.5rem;
+        margin: 0 10px;
+        transition: color 0.3s;
+    }
+    .social-links a:hover {
+        color: #0056b3;
+    }
+    .achievement-badge {
+        display: inline-flex;
+        align-items: center;
+        background-color: #28a745;
+        color: white;
+        padding: 5px 10px;
+        border-radius: 15px;
+        margin: 5px;
+        font-size: 0.9rem;
+    }
+    .achievement-badge i {
+        margin-right: 5px;
+    }
+    .stats-card {
+        text-align: center;
+        padding: 15px;
+        background-color: #f8f9fa;
+        border-radius: 8px;
+        margin-bottom: 15px;
+    }
+
+    /* Responsive Design */
+    @media (max-width: 767.98px) {
+        .profile-hero {
+            padding: 40px 0;
+        }
+        .profile-pic {
+            width: 120px;
+            height: 120px;
+        }
+        .course-card, .certificate-card, .activity-card {
+            flex-direction: column;
+            text-align: center;
+        }
+        .course-card img {
+            margin-right: 0;
+            margin-bottom: 10px;
+        }
+        .certificate-card .btn {
+            margin-top: 10px;
+        }
+        .social-links a {
+            font-size: 1.2rem;
+            margin: 0 5px;
+        }
+        .stats-card {
+            padding: 10px;
+        }
+        .achievement-badge {
+            display: block;
+            margin: 5px 0;
+        }
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<!-- Profile Hero Section -->
+<section class="profile-hero">
+    <div class="container">
+        <img src="{{ user.profile.profile_pic.url|default:'/static/images/default_profile.png' }}" alt="Profile Picture" 
+             class="rounded-circle img-fluid profile-pic mb-3">
+        <h2 class="mb-2">{{ user.get_full_name|default:user.username }}</h2>
+        <p class="text-muted mb-2">{{ user.email }}</p>
+        <span class="badge bg-{% if membership_status == 'Premium' %}success{% else %}secondary{% endif %} membership-badge">
+            {{ membership_status }} Member
+        </span>
+        <p class="mt-3">Last Active: {{ last_active|date:"F d, Y H:i" }}</p>
+        <div class="social-links mt-3">
+            {% if user.profile.linkedin_url %}
+                <a href="{{ user.profile.linkedin_url }}" target="_blank" title="LinkedIn">
+                    <i class="fab fa-linkedin"></i>
+                </a>
+            {% endif %}
+            {% if user.profile.twitter_url %}
+                <a href="{{ user.profile.twitter_url }}" target="_blank" title="Twitter">
+                    <i class="fab fa-twitter"></i>
+                </a>
+            {% endif %}
+        </div>
+        <button class="btn btn-light share-btn mt-2" onclick="shareProfile()">
+            <i class="fas fa-share-alt me-2"></i> Share Profile
+        </button>
+    </div>
+</section>
+
+<div class="container">
+    <div class="row">
+        <!-- Profile Information -->
+        <div class="col-md-6 col-lg-4 mb-4">
+            <div class="card">
+                <div class="card-header bg-primary text-white" data-bs-toggle="collapse" href="#profileInfoCollapse" role="button" aria-expanded="false" aria-controls="profileInfoCollapse">
+                    <h4 class="mb-0">Profile Information</h4>
+                    <i class="fas fa-chevron-down toggle-icon"></i>
+                </div>
+                <div class="collapse show" id="profileInfoCollapse">
+                    <div class="card-body">
+                        <div class="mb-3">
+                            <h6>Profile Completion</h6>
+                            <div class="progress">
+                                <div class="progress-bar bg-success" role="progressbar" 
+                                     style="width: {{ profile_completion }}%;" 
+                                     aria-valuenow="{{ profile_completion }}" 
+                                     aria-valuemin="0" aria-valuemax="100">
+                                    {{ profile_completion|floatformat:0 }}%
+                                </div>
+                            </div>
+                        </div>
+                        <form method="POST" enctype="multipart/form-data">
+                            {% csrf_token %}
+                            {{ u_form|crispy }}
+                            {{ p_form|crispy }}
+                            <button type="submit" class="btn btn-primary w-100">Update Profile</button>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Learning Statistics -->
+        <div class="col-md-6 col-lg-4 mb-4">
+            <div class="card">
+                <div class="card-header bg-info text-white" data-bs-toggle="collapse" href="#learningStatsCollapse" role="button" aria-expanded="false" aria-controls="learningStatsCollapse">
+                    <h4 class="mb-0">Learning Statistics</h4>
+                    <i class="fas fa-chevron-down toggle-icon"></i>
+                </div>
+                <div class="collapse show" id="learningStatsCollapse">
+                    <div class="card-body">
+                        <div class="stats-card">
+                            <h6>Total Enrolled</h6>
+                            <p class="text-primary fw-bold">{{ learning_stats.total_enrolled }}</p>
+                        </div>
+                        <div class="stats-card">
+                            <h6>Total Completed</h6>
+                            <p class="text-success fw-bold">{{ learning_stats.total_completed }}</p>
+                        </div>
+                        <div class="stats-card">
+                            <h6>In Progress</h6>
+                            <p class="text-warning fw-bold">{{ learning_stats.total_in_progress }}</p>
+                        </div>
+                        <div class="stats-card">
+                            <h6>Time Spent Learning</h6>
+                            <p class="text-muted">{{ learning_stats.total_time_spent }}</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Achievements -->
+        <div class="col-md-6 col-lg-4 mb-4">
+            <div class="card">
+                <div class="card-header bg-warning text-white">
+                    <h4 class="mb-0">Achievements</h4>
+                </div>
+                <div class="card-body">
+                    {% if achievements %}
+                        {% for achievement in achievements %}
+                        <span class="achievement-badge">
+                            <i class="{{ achievement.icon }}"></i> {{ achievement.name }}
+                        </span>
+                        {% endfor %}
+                    {% else %}
+                        <p class="text-muted">No achievements yet. Keep learning!</p>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+
+        <!-- Completed Courses -->
+        <div class="col-md-6 col-lg-4 mb-4">
+            <div class="card">
+                <div class="card-header bg-success text-white">
+                    <h4 class="mb-0">Completed Courses</h4>
+                </div>
+                <div class="card-body">
+                    {% if completed_courses %}
+                        {% for course in completed_courses %}
+                        <div class="course-card">
+                            <img src="{{ course.thumbnail.url|default:'/static/images/default-course.jpg' }}" alt="{{ course.title }}">
+                            <div>
+                                <h6 class="mb-1">{{ course.title }}</h6>
+                                <p class="text-muted small mb-0">Completed</p>
+                            </div>
+                        </div>
+                        {% endfor %}
+                    {% else %}
+                        <p class="text-muted">You haven't completed any courses yet.</p>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+
+        <!-- Course Progress -->
+        <div class="col-md-6 col-lg-4 mb-4">
+            <div class="card">
+                <div class="card-header bg-info text-white">
+                    <h4 class="mb-0">Course Progress</h4>
+                </div>
+                <div class="card-body">
+                    {% if enrolled_courses %}
+                        {% for course in enrolled_courses %}
+                        <div class="course-card">
+                            <img src="{{ course.thumbnail.url|default:'/static/images/default-course.jpg' }}" alt="{{ course.title }}">
+                            <div class="w-100">
+                                <h6 class="mb-1">{{ course.title }}</h6>
+                                <div class="progress">
+                                    <div class="progress-bar bg-info" role="progressbar" 
+                                         style="width: {{ course_progress|dictsort:course.id }}%;" 
+                                         aria-valuenow="{{ course_progress|dictsort:course.id }}" 
+                                         aria-valuemin="0" aria-valuemax="100">
+                                        {{ course_progress|dictsort:course.id }}%
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        {% endfor %}
+                    {% else %}
+                        <p class="text-muted">You haven't enrolled in any courses yet.</p>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+
+        <!-- Certificates Achieved -->
+        <div class="col-md-6 col-lg-4 mb-4">
+            <div class="card">
+                <div class="card-header bg-warning text-white">
+                    <h4 class="mb-0">Certificates Achieved</h4>
+                </div>
+                <div class="card-body">
+                    {% if certificates %}
+                        {% for cert in certificates %}
+                        <div class="certificate-card">
+                            <div>
+                                <h6 class="mb-1">
+                                    {{ cert.course.title }}
+                                    <span class="badge bg-{% if cert.source == 'admin' %}primary{% else %}secondary{% endif %} source-badge">
+                                        {% if cert.source == 'admin' %}Admin Issued{% else %}Auto-Generated{% endif %}
+                                    </span>
+                                </h6>
+                                <p class="text-muted small mb-0">Achieved on {{ cert.date_achieved|date:"F d, Y" }}</p>
+                            </div>
+                            {% if cert.certificate_url %}
+                            <a href="{{ cert.certificate_url }}" class="btn btn-sm btn-outline-primary download-cert-btn" download>
+                                <i class="fas fa-download me-1"></i> Download
+                            </a>
+                            {% else %}
+                            <span class="text-muted small">Certificate unavailable</span>
+                            {% endif %}
+                        </div>
+                        {% endfor %}
+                    {% else %}
+                        <p class="text-muted">No certificates achieved yet.</p>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+
+        <!-- Recent Activity -->
+        <div class="col-md-12 mb-4">
+            <div class="card">
+                <div class="card-header bg-secondary text-white">
+                    <h4 class="mb-0">Recent Activity</h4>
+                </div>
+                <div class="card-body">
+                    {% if recent_activities %}
+                        {% for activity in recent_activities %}
+                        <div class="activity-card">
+                            <p class="mb-0">{{ activity.action }} <small class="text-muted">({{ activity.timestamp|timesince }} ago)</small></p>
+                        </div>
+                        {% endfor %}
+                    {% else %}
+                        <p class="text-muted">No recent activities.</p>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+{% block extra_js %}
+<script>
+function shareProfile() {
+    const url = window.location.href;
+    const shareText = `Check out my profile on TradingPro Academy! ${url}`;
+    if (navigator.share) {
+        navigator.share({
+            title: 'My Profile - TradingPro Academy',
+            text: shareText,
+            url: url,
+        }).catch(err => console.error('Share failed:', err));
+    } else {
+        navigator.clipboard.writeText(shareText).then(() => {
+            alert('Profile link copied to clipboard!');
+        }).catch(err => {
+            console.error('Copy failed:', err);
+            alert('Failed to copy link. Please copy manually: ' + shareText);
+        });
+    }
+}
+
+// Update toggle icon on collapse/expand
+document.querySelectorAll('.card-header[data-bs-toggle="collapse"]').forEach(header => {
+    header.addEventListener('click', function () {
+        const icon = this.querySelector('.toggle-icon');
+        if (this.getAttribute('aria-expanded') === 'true') {
+            icon.classList.remove('collapsed');
+        } else {
+            icon.classList.add('collapsed');
+        }
+    });
+});
+
+// Handle certificate download errors
+document.querySelectorAll('.download-cert-btn').forEach(button => {
+    button.addEventListener('click', function (event) {
+        const url = this.getAttribute('href');
+        fetch(url, { method: 'HEAD' })
+            .then(response => {
+                if (!response.ok) {
+                    event.preventDefault();
+                    alert('Failed to download certificate. The file may be unavailable or invalid.');
+                }
+            })
+            .catch(() => {
+                event.preventDefault();
+                alert('Failed to download certificate. The file may be unavailable or invalid.');
+            });
+    });
+});
+</script>
+{% endblock extra_js%}
+{% endblock content %}

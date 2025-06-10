@@ -1,0 +1,168 @@
+{% extends 'base.html' %}
+{% load crispy_forms_tags %}
+
+{% block title %}My Profile - TradingPro Academy{% endblock %}
+
+{% block extra_css %}
+<style>
+    .profile-container {
+        max-width: 1000px;
+        margin: 0 auto;
+    }
+    
+    .profile-sidebar {
+        background-color: #f8f9fa;
+        border-radius: 10px;
+        padding: 20px;
+        height: 100%;
+    }
+    
+    .profile-pic {
+        width: 150px;
+        height: 150px;
+        object-fit: cover;
+        border: 5px solid white;
+        box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+    }
+    
+    .nav-pills .nav-link.active {
+        background-color: #0d6efd;
+    }
+    
+    .nav-pills .nav-link {
+        color: #495057;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="container my-5">
+    <div class="profile-container">
+        <div class="d-flex justify-content-between align-items-center mb-4">
+            <h2><i class="fas fa-user-circle me-2"></i> My Profile</h2>
+            <a href="{% url 'course_list' %}" class="btn btn-outline-primary">
+                <i class="fas fa-arrow-left me-1"></i> Back to Courses
+            </a>
+        </div>
+        
+        <div class="row">
+            <!-- Sidebar -->
+            <div class="col-md-4 mb-4">
+                <div class="profile-sidebar text-center">
+                    <div class="mb-4">
+                        <img src="{{ user.profile.profile_pic.url }}" class="rounded-circle profile-pic mb-3" 
+                             alt="Profile Picture">
+                        <h4>{{ user.get_full_name|default:user.username }}</h4>
+                        <p class="text-muted">{{ user.email }}</p>
+                        <p class="text-muted">
+                            <i class="fas fa-phone me-1"></i> {{ user.mobile_number|default:"Not provided" }}
+                        </p>
+                    </div>
+                    
+                    <ul class="nav nav-pills flex-column">
+                        <li class="nav-item">
+                            <a class="nav-link active" href="#profile" data-bs-toggle="pill">
+                                <i class="fas fa-user me-2"></i> Profile
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="#courses" data-bs-toggle="pill">
+                                <i class="fas fa-book me-2"></i> My Courses
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="#settings" data-bs-toggle="pill">
+                                <i class="fas fa-cog me-2"></i> Settings
+                            </a>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+            
+            <!-- Content -->
+            <div class="col-md-8">
+                <div class="card">
+                    <div class="card-body">
+                        <div class="tab-content">
+                            <!-- Profile Tab -->
+                            <div class="tab-pane fade show active" id="profile">
+                                <h4 class="card-title mb-4">
+                                    <i class="fas fa-user-edit me-2"></i> Edit Profile
+                                </h4>
+                                
+                                <form method="POST" enctype="multipart/form-data">
+                                    {% csrf_token %}
+                                    <div class="row">
+                                        <div class="col-md-6">
+                                            {{ u_form.username|as_crispy_field }}
+                                        </div>
+                                        <div class="col-md-6">
+                                            {{ u_form.email|as_crispy_field }}
+                                        </div>
+                                    </div>
+                                    
+                                    <div class="row">
+                                        <div class="col-md-6">
+                                            {{ u_form.first_name|as_crispy_field }}
+                                        </div>
+                                        <div class="col-md-6">
+                                            {{ u_form.last_name|as_crispy_field }}
+                                        </div>
+                                    </div>
+                                    
+                                    {{ u_form.mobile_number|as_crispy_field }}
+                                    {{ p_form.address|as_crispy_field }}
+                                    
+                                    <div class="mb-3">
+                                        <label class="form-label">Profile Picture</label>
+                                        <div class="d-flex align-items-center">
+                                            <img src="{{ user.profile.profile_pic.url }}" 
+                                                 class="rounded-circle me-3" width="60" height="60">
+                                            {{ p_form.profile_pic }}
+                                        </div>
+                                    </div>
+                                    
+                                    <div class="d-grid">
+                                        <button type="submit" class="btn btn-primary">
+                                            <i class="fas fa-save me-2"></i> Save Changes
+                                        </button>
+                                    </div>
+                                </form>
+                            </div>
+                            
+                            <!-- Courses Tab -->
+                            <div class="tab-pane fade" id="courses">
+                                <h4 class="card-title mb-4">
+                                    <i class="fas fa-book me-2"></i> My Courses
+                                </h4>
+                                <div class="alert alert-info">
+                                    You haven't enrolled in any courses yet. <a href="{% url 'course_list' %}">Browse courses</a> to get started.
+                                </div>
+                            </div>
+                            
+                            <!-- Settings Tab -->
+                            <div class="tab-pane fade" id="settings">
+                                <h4 class="card-title mb-4">
+                                    <i class="fas fa-cog me-2"></i> Account Settings
+                                </h4>
+                                <div class="alert alert-warning">
+                                    <h5><i class="fas fa-shield-alt me-2"></i> Security</h5>
+                                    <p>Change your password or enable two-factor authentication.</p>
+                                    <a href="#" class="btn btn-sm btn-outline-primary">Change Password</a>
+                                    <a href="#" class="btn btn-sm btn-outline-primary ms-2">Two-Factor Auth</a>
+                                </div>
+                                
+                                <div class="alert alert-danger mt-4">
+                                    <h5><i class="fas fa-exclamation-triangle me-2"></i> Danger Zone</h5>
+                                    <p>Deleting your account is permanent and cannot be undone.</p>
+                                    <button class="btn btn-sm btn-outline-danger">Delete Account</button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

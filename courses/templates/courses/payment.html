@@ -1,0 +1,97 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Payment - {{ course.title }}{% endblock %}
+
+{% block extra_css %}
+<style>
+    .payment-container {
+        max-width: 600px;
+        margin: 2rem auto;
+        padding: 2rem;
+        border-radius: 10px;
+        box-shadow: 0 0 20px rgba(0, 0, 0, 0.1);
+        background-color: white;
+    }
+    .course-thumbnail {
+        height: 150px;
+        object-fit: cover;
+        border-radius: 8px;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="container my-5">
+    <div class="payment-container">
+        <div class="text-center mb-4">
+            <h2>Complete Your Purchase</h2>
+            <p class="text-muted">Secure payment via Razorpay</p>
+        </div>
+        
+        <div class="card mb-4">
+            <div class="row g-0">
+                <div class="col-md-4">
+                    <img src="{{ course.thumbnail.url }}" class="img-fluid rounded-start course-thumbnail" alt="{{ course.title }}">
+                </div>
+                <div class="col-md-8">
+                    <div class="card-body">
+                        <h5 class="card-title">{{ course.title }}</h5>
+                        <p class="card-text text-muted">{{ course.description|truncatewords:15 }}</p>
+                        <h4 class="text-primary">₹{{ amount }}</h4>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="d-grid gap-2">
+            <button id="rzp-button" class="btn btn-primary btn-lg">
+                <i class="fas fa-lock me-2"></i> Pay Securely
+            </button>
+            <a href="{% url 'course_detail' course.id %}" class="btn btn-outline-secondary">
+                Cancel
+            </a>
+        </div>
+    </div>
+</div>
+
+<script src="https://checkout.razorpay.com/v1/checkout.js"></script>
+<script>
+    var options = {
+        "key": "{{ razorpay_key }}",
+        "amount": "{{ order.amount }}",
+        "currency": "{{ order.currency }}",
+        "name": "TradingPro Academy",
+        "description": "Purchase of {{ course.title }}",
+        "image": "{% static 'images/logo.png' %}",
+        "order_id": "{{ order.id }}",
+        "handler": function (response){
+            window.location.href = "{% url 'payment_success' %}";
+        },
+        "prefill": {
+            "name": "{{ user.get_full_name }}",
+            "email": "{{ user.email }}",
+            "contact": "{{ user.mobile_number }}"
+        },
+        "theme": {
+            "color": "#0d6efd"
+        },
+        "modal": {
+            "ondismiss": function(){
+                window.location.href = "{% url 'course_detail' course.id %}";
+            }
+        }
+    };
+    
+    var rzp1 = new Razorpay(options);
+    document.getElementById('rzp-button').onclick = function(e){
+        rzp1.open();
+        e.preventDefault();
+    }
+    
+    // Auto open payment dialog
+    window.onload = function(){
+        document.getElementById('rzp-button').click();
+    }
+</script>
+{% endblock %}

@@ -1,0 +1,81 @@
+{% extends 'base.html' %}
+{% load crispy_forms_tags %}
+{% load static %}
+{% block title %}Register - TradingPro Academy{% endblock %}
+
+{% block extra_css %}
+<style>
+    .register-container {
+        max-width: 600px;
+        margin: 0 auto;
+        padding: 30px;
+        border-radius: 10px;
+        box-shadow: 0 0 20px rgba(0, 0, 0, 0.1);
+        background-color: white;
+    }
+    
+    .register-header {
+        text-align: center;
+        margin-bottom: 30px;
+    }
+    
+    .register-header i {
+        font-size: 3rem;
+        color: #0d6efd;
+        margin-bottom: 15px;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="container my-5">
+    <div class="register-container">
+        <div class="register-header">
+            <i class="fas fa-user-plus"></i>
+            <h2>Create Your TradingPro Account</h2>
+            <p class="text-muted">Join our community of traders and start learning today</p>
+        </div>
+        
+        <form method="POST" novalidate>
+            {% csrf_token %}
+            <div class="row">
+                <div class="col-md-6 mb-3">
+                    {{ form.username|as_crispy_field }}
+                </div>
+                <div class="col-md-6 mb-3">
+                    {{ form.email|as_crispy_field }}
+                </div>
+            </div>
+            
+            <div class="row">
+                <div class="col-md-6 mb-3">
+                    {{ form.mobile_number|as_crispy_field }}
+                </div>
+                <div class="col-md-6 mb-3">
+                    {{ form.password1|as_crispy_field }}
+                </div>
+            </div>
+            
+            <div class="mb-4">
+                {{ form.password2|as_crispy_field }}
+            </div>
+            
+            <div class="d-grid">
+                <button type="submit" class="btn btn-primary btn-lg">
+                    <i class="fas fa-user-plus me-2"></i> Register
+                </button>
+            </div>
+            
+            <div class="text-center mt-3">
+                <p class="mb-0">Already have an account? <a href="{% url 'login' %}">Login here</a></p>
+            </div>
+            
+            <div class="mt-4 pt-3 border-top text-center">
+                <small class="text-muted">
+                    By registering, you agree to our <a href="#">Terms of Service</a> and <a href="#">Privacy Policy</a>
+                </small>
+            </div>
+        </form>
+    </div>
+</div>
+{% endblock %}

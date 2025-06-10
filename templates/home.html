@@ -1,0 +1,165 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Home - TradingPro Academy{% endblock %}
+
+{% block extra_css %}
+<style>
+    .hero-section {
+        background: linear-gradient(rgba(0, 0, 0, 0.7), rgba(0, 0, 0, 0.7)), url('{% static "images/trading-bg.jpg" %}');
+        background-size: cover;
+        background-position: center;
+        color: white;
+        padding: 100px 0;
+        margin-bottom: 50px;
+    }
+    
+    .feature-icon {
+        font-size: 2.5rem;
+        color: #0d6efd;
+        margin-bottom: 1rem;
+    }
+    
+    .testimonial-img {
+        width: 80px;
+        height: 80px;
+        object-fit: cover;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<!-- Hero Section -->
+<section class="hero-section text-center">
+    <div class="container">
+        <h1 class="display-4 fw-bold mb-4">Master the Markets with TradingPro</h1>
+        <p class="lead mb-5">Professional trading courses designed to take you from beginner to expert trader</p>
+        <div class="d-grid gap-2 d-sm-flex justify-content-sm-center">
+            <a href="{% url 'course_list' %}" class="btn btn-primary btn-lg px-4 gap-3">Browse Courses</a>
+            <a href="{% url 'free_courses' %}" class="btn btn-outline-light btn-lg px-4">Free Courses</a>
+        </div>
+    </div>
+</section>
+
+<!-- Features Section -->
+<section class="container mb-5">
+    <div class="row text-center">
+        <div class="col-md-4 mb-4">
+            <div class="feature-icon">
+                <i class="fas fa-chart-bar"></i>
+            </div>
+            <h3>Market Analysis</h3>
+            <p>Learn technical and fundamental analysis techniques used by professional traders.</p>
+        </div>
+        <div class="col-md-4 mb-4">
+            <div class="feature-icon">
+                <i class="fas fa-hand-holding-usd"></i>
+            </div>
+            <h3>Risk Management</h3>
+            <p>Master risk management strategies to protect your capital and maximize profits.</p>
+        </div>
+        <div class="col-md-4 mb-4">
+            <div class="feature-icon">
+                <i class="fas fa-user-tie"></i>
+            </div>
+            <h3>Expert Instructors</h3>
+            <p>Learn from professional traders with years of market experience.</p>
+        </div>
+    </div>
+</section>
+
+<!-- Popular Courses -->
+<section class="bg-light py-5">
+    <div class="container">
+        <h2 class="text-center mb-5">Popular Trading Courses</h2>
+        <div class="row">
+            {% for course in popular_courses %}
+            <div class="col-lg-4 col-md-6 mb-4">
+                <div class="card h-100">
+                    <img src="{{ course.thumbnail.url }}" class="card-img-top" alt="{{ course.title }}">
+                    <div class="card-body">
+                        <h5 class="card-title">{{ course.title }}</h5>
+                        <p class="card-text">{{ course.description|truncatewords:20 }}</p>
+                        <div class="d-flex justify-content-between align-items-center">
+                            {% if course.is_free %}
+                            <span class="badge bg-success">Free</span>
+                            {% else %}
+                            <span class="text-primary fw-bold">${{ course.price }}</span>
+                            {% endif %}
+                            <a href="{% url 'course_detail' course.pk %}" class="btn btn-sm btn-outline-primary">View Course</a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+        <div class="text-center mt-4">
+            <a href="{% url 'course_list' %}" class="btn btn-primary">View All Courses</a>
+        </div>
+    </div>
+</section>
+
+<!-- Testimonials -->
+<section class="container py-5">
+    <h2 class="text-center mb-5">What Our Students Say</h2>
+    <div class="row">
+        <div class="col-md-4 mb-4">
+            <div class="card h-100">
+                <div class="card-body text-center">
+                    <img src="{% static 'images/testimonial1.jpg' %}" class="rounded-circle testimonial-img mb-3" alt="Student">
+                    <p class="card-text">"The technical analysis course completely changed how I approach the markets. Highly recommended!"</p>
+                    <h5 class="card-title">Sarah Johnson</h5>
+                    <div class="text-warning">
+                        <i class="fas fa-star"></i>
+                        <i class="fas fa-star"></i>
+                        <i class="fas fa-star"></i>
+                        <i class="fas fa-star"></i>
+                        <i class="fas fa-star"></i>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-4 mb-4">
+            <div class="card h-100">
+                <div class="card-body text-center">
+                    <img src="{% static 'images/testimonial2.jpg' %}" class="rounded-circle testimonial-img mb-3" alt="Student">
+                    <p class="card-text">"The risk management strategies I learned saved me thousands. Worth every penny!"</p>
+                    <h5 class="card-title">Michael Chen</h5>
+                    <div class="text-warning">
+                        <i class="fas fa-star"></i>
+                        <i class="fas fa-star"></i>
+                        <i class="fas fa-star"></i>
+                        <i class="fas fa-star"></i>
+                        <i class="fas fa-star"></i>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-4 mb-4">
+            <div class="card h-100">
+                <div class="card-body text-center">
+                    <img src="{% static 'images/testimonial3.jpg' %}" class="rounded-circle testimonial-img mb-3" alt="Student">
+                    <p class="card-text">"From complete beginner to consistently profitable in 6 months. Amazing courses!"</p>
+                    <h5 class="card-title">David Rodriguez</h5>
+                    <div class="text-warning">
+                        <i class="fas fa-star"></i>
+                        <i class="fas fa-star"></i>
+                        <i class="fas fa-star"></i>
+                        <i class="fas fa-star"></i>
+                        <i class="fas fa-star-half-alt"></i>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Call to Action -->
+<section class="bg-primary text-white py-5">
+    <div class="container text-center">
+        <h2 class="mb-4">Ready to Start Your Trading Journey?</h2>
+        <p class="lead mb-4">Join thousands of students who have transformed their trading skills with our courses</p>
+        <a href="{% url 'register' %}" class="btn btn-light btn-lg">Sign Up Now</a>
+    </div>
+</section>
+{% endblock %}

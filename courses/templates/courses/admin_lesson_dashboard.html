@@ -1,0 +1,57 @@
+{% extends 'base.html' %}
+{% block title %}Lesson Dashboard{% endblock %}
+{% block content %}
+<div class="container mt-5">
+    <h2>Lesson Management</h2>
+    <div class="card mb-4">
+        <div class="card-body">
+            <h3>Lessons</h3>
+            <table class="table table-striped">
+                <thead>
+                    <tr>
+                        <th>Title</th>
+                        <th>Course</th>
+                        <th>Module</th>
+                        <th>Cloudinary ID</th>
+                        <th>Status</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for lesson in lessons %}
+                    <tr>
+                        <td>{{ lesson.title }}</td>
+                        <td>{{ lesson.module.course.title }}</td>
+                        <td>{{ lesson.module.title }}</td>
+                        <td>{{ lesson.cloudinary_public_id|default:"Not Uploaded" }}</td>
+                        <td>{{ lesson.video_url|yesno:"Uploaded,Not Uploaded" }}</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+    <div class="card">
+        <div class="card-body">
+            <h3>View Analytics (Last 50 Views)</h3>
+            <table class="table table-striped">
+                <thead>
+                    <tr>
+                        <th>Lesson</th>
+                        <th>User</th>
+                        <th>Viewed At</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for view in analytics %}
+                    <tr>
+                        <td>{{ view.lesson.title }}</td>
+                        <td>{{ view.user.username|default:"Anonymous" }}</td>
+                        <td>{{ view.viewed_at }}</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+{% endblock %}

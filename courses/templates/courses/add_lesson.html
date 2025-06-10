@@ -1,0 +1,52 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Add Lesson - {{ module.title }}{% endblock %}
+
+{% block extra_css %}
+<style>
+    .progress-container {
+        display: none;
+        margin-top: 20px;
+    }
+    .progress-container.active {
+        display: block;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="container mt-5">
+    <h2>Add Lesson to {{ module.title }}</h2>
+    <form method="post" enctype="multipart/form-data" id="lessonForm">
+        {% csrf_token %}
+        {{ form.as_p }}
+        <button type="submit" class="btn btn-primary">Add Lesson</button>
+    </form>
+    
+    <div class="progress-container" id="progressContainer">
+        <div class="progress">
+            <div class="progress-bar" role="progressbar" id="uploadProgress" style="width: 0%;" aria-valuenow="0" aria-valuemin="0" aria-valuemax="100">0%</div>
+        </div>
+    </div>
+</div>
+
+<script>
+document.getElementById('lessonForm').addEventListener('submit', function(e) {
+    const videoInput = document.querySelector('input[type="file"]');
+    if (videoInput.files.length > 0) {
+        document.getElementById('progressContainer').classList.add('active');
+        let progress = 0;
+        const progressBar = document.getElementById('uploadProgress');
+        const interval = setInterval(() => {
+            progress += 10;
+            progressBar.style.width = progress + '%';
+            progressBar.textContent = progress + '%';
+            if (progress >= 100) {
+                clearInterval(interval);
+            }
+        }, 500);
+    }
+});
+</script>
+{% endblock %}

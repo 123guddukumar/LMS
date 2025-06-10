@@ -1,0 +1,609 @@
+{% extends 'base.html' %}
+{% load static %}
+{% load courses_tags %}
+
+{% block title %}{{ course.title }} - TradingPro Academy{% endblock %}
+
+{% block extra_css %}
+<link href="https://vjs.zencdn.net/7.20.3/video-js.css" rel="stylesheet" />
+<style>
+    .course-hero {
+        background: linear-gradient(rgba(0, 0, 0, 0.7), rgba(0, 0, 0, 0.7)), url('{% if course.thumbnail %}{{ course.thumbnail.url }}{% else %}{% static "images/course-detail-bg.jpg" %}{% endif %}');
+        background-size: cover;
+        background-position: center;
+        color: white;
+        padding: 80px 0 40px;
+        margin-bottom: 40px;
+    }
+    .course-sidebar {
+        position: sticky;
+        top: 20px;
+    }
+    .sidebar-card {
+        border: none;
+        box-shadow: 0 0 20px rgba(0, 0, 0, 0.1);
+        border-radius: 10px;
+        overflow: hidden;
+    }
+    .price-tag {
+        font-size: 2rem;
+        font-weight: bold;
+    }
+    .original-price {
+        text-decoration: line-through;
+        color: #6c757d;
+    }
+    .module-item {
+        border-left: 3px solid #0d6efd;
+        transition: all 0.3s;
+    }
+    .module-item:hover {
+        background-color: #f8f9fa;
+    }
+    .lesson-item {
+        padding-left: 30px;
+        border-left: 2px solid #dee2e6;
+        transition: all 0.3s;
+        cursor: pointer;
+    }
+    .lesson-item:hover {
+        background-color: #f8f9fa;
+    }
+    .instructor-img {
+        width: 80px;
+        height: 80px;
+        object-fit: cover;
+    }
+    .accordion-button:not(.collapsed) {
+        background-color: rgba(13, 110, 253, 0.1);
+        color: #0d6efd;
+    }
+    .video-container {
+        position: relative;
+        padding-bottom: 56.25%;
+        height: 0;
+        overflow: hidden;
+        margin-bottom: 20px;
+    }
+    .video-container video {
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+    }
+    .whatsapp-btn {
+        background-color: #25D366;
+        border-color: #25D366;
+    }
+    .whatsapp-btn:hover {
+        background-color: #128C7E;
+        border-color: #128C7E;
+    }
+    .btn-resume {
+        background-color: #28a745;
+        border-color: #28a745;
+    }
+    .btn-resume:hover {
+        background-color: #218838;
+        border-color: #218838;
+    }
+    .enrolled-badge {
+        font-size: 1rem;
+        padding: 8px 15px;
+    }
+    .progress-bar {
+        transition: width 0.3s ease-in-out;
+    }
+    .bookmark-btn {
+        font-size: 1.2rem;
+    }
+    .course-thumbnail {
+        width: 100%;
+        height: auto;
+        border-radius: 10px;
+        margin-bottom: 20px;
+    }
+    .modal-video .modal-dialog {
+        max-width: 800px;
+    }
+    .modal-video .modal-content {
+        background-color: #000;
+        border: none;
+        border-radius: 10px;
+    }
+    .modal-video .modal-header {
+        border-bottom: none;
+        color: white;
+        padding: 10px 20px;
+    }
+    .modal-video .modal-body {
+        padding: 0;
+    }
+    .modal-video .modal-footer {
+        border-top: none;
+        padding: 10px 20px;
+        display: flex;
+        justify-content: center;
+        gap: 10px;
+    }
+    .modal-video .btn-close {
+        filter: invert(1);
+    }
+    .custom-controls {
+        background: rgba(0, 0, 0, 0.7);
+        border-radius: 5px;
+        padding: 5px 10px;
+    }
+    .custom-controls button {
+        background: none;
+        border: none;
+        color: white;
+        font-size: 1.2rem;
+        margin: 0 5px;
+        transition: color 0.3s;
+    }
+    .custom-controls button:hover {
+        color: #0d6efd;
+    }
+    .custom-controls .play-pause-btn i {
+        font-size: 1.5rem;
+    }
+
+    /* Responsive Design */
+    @media (max-width: 767.98px) {
+        .course-hero {
+            padding: 60px 0 30px;
+        }
+        .course-hero h1 {
+            font-size: 1.8rem;
+        }
+        .price-tag {
+            font-size: 1.5rem;
+        }
+        .instructor-img {
+            width: 60px;
+            height: 60px;
+        }
+        .lesson-item {
+            padding-left: 15px;
+        }
+        .progress {
+            width: 80px !important;
+        }
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<section class="course-hero">
+    <div class="container">
+        <div class="row align-items-center">
+            <div class="col-lg-8">
+                <h1 class="display-5 fw-bold mb-3">{{ course.title }}</h1>
+                <p class="lead mb-4">{{ course.description }}</p>
+                <div class="d-flex flex-wrap align-items-center gap-3 mb-4">
+                    <div class="text-white">
+                        <i class="fas fa-clock me-1"></i> {{ course.duration }}
+                    </div>
+                    <div class="text-white">
+                        <i class="fas fa-users me-1"></i> {{ course.enrollments.count }} students
+                    </div>
+                    {% if is_enrolled or course.is_free %}
+                    <span class="badge bg-success enrolled-badge">
+                        <i class="fas fa-check-circle me-1"></i> {% if course.is_free %}Free Access{% else %}Enrolled{% endif %}
+                    </span>
+                    {% endif %}
+                </div>
+                {% if is_enrolled or course.is_free %}
+                <div class="progress mb-4" style="max-width: 500px;">
+                    <div class="progress-bar bg-success" role="progressbar" 
+                         style="width: {{ course_progress }}%;" 
+                         aria-valuenow="{{ course_progress }}" 
+                         aria-valuemin="0" aria-valuemax="100">
+                        {{ course_progress|floatformat:0 }}%
+                    </div>
+                </div>
+                {% endif %}
+                {% if is_enrolled or course.is_free %}
+                    {% if last_lesson %}
+                    <a href="#" class="btn btn-resume btn-lg me-3">Resume Learning: {{ last_lesson.title }}</a>
+                    {% else %}
+                    <a href="#" class="btn btn-primary btn-lg me-3">Start Course</a>
+                    {% endif %}
+                {% endif %}
+                <a href="{{ whatsapp_link }}" class="btn whatsapp-btn btn-lg" target="_blank">
+                    <i class="fab fa-whatsapp me-2"></i> Get Support
+                </a>
+            </div>
+        </div>
+    </div>
+</section>
+
+<main class="flex-grow-1" id="main-content">
+    <div class="container">
+        <div class="row">
+            <div class="col-lg-8 mb-5">
+                {% if not is_enrolled and not course.is_free %}
+                <!-- Show not enrolled message for paid courses if not enrolled -->
+                <div class="alert alert-warning text-center">
+                    <h4 class="alert-heading">Not Enrolled</h4>
+                    <p>You need to enroll in this course to access the content.</p>
+                    <a href="{% url 'initiate_payment' course.id %}" class="btn btn-primary">Enroll Now</a>
+                </div>
+                {% else %}
+                <!-- Show course content for enrolled users or free courses -->
+                <div class="card mb-4 border-0 shadow-sm">
+                    <div class="card-body">
+                        <h3 class="card-title mb-4">Course Content</h3>
+                        <div class="accordion" id="courseAccordion">
+                            {% for module in modules %}
+                            <div class="accordion-item mb-2 border-0 module-item">
+                                <h2 class="accordion-header" id="heading{{ module.id }}">
+                                    <button class="accordion-button collapsed py-3" type="button" 
+                                            data-bs-toggle="collapse" data-bs-target="#collapse{{ module.id }}">
+                                        <div class="d-flex justify-content-between w-100 me-3">
+                                            <span>
+                                                <i class="fas fa-folder-open text-primary me-2"></i>
+                                                {{ module.title }}
+                                            </span>
+                                            <span class="text-muted small">{{ module.lessons.count }} lessons</span>
+                                        </div>
+                                    </button>
+                                </h2>
+                                <div id="collapse{{ module.id }}" class="accordion-collapse collapse" 
+                                     aria-labelledby="heading{{ module.id }}" data-bs-parent="#courseAccordion">
+                                    <div class="accordion-body p-0">
+                                        <ul class="list-group list-group-flush">
+                                            {% for lesson in module.lessons.all %}
+                                            <li class="list-group-item py-3 lesson-item" 
+                                                data-video-url="{{ lesson.get_secure_streaming_url }}" 
+                                                data-lesson-id="{{ lesson.id }}"
+                                                data-is-enrolled="true"  <!-- Always true for free courses or enrolled users -->
+                                                data-title="{{ lesson.title }}"
+                                                tabindex="0">
+                                                <div class="d-flex justify-content-between align-items-center">
+                                                    <div>
+                                                        <i class="fas fa-play-circle text-primary me-2 play-video-icon"></i>
+                                                        {{ lesson.title }}
+                                                        {% if forloop.first %}
+                                                        <span class="badge bg-info ms-2">Preview</span>
+                                                        {% endif %}
+                                                    </div>
+                                                    <div class="d-flex align-items-center">
+                                                        <div class="progress me-3" style="width: 100px;">
+                                                            <div class="progress-bar bg-success" role="progressbar" 
+                                                                 style="width: {{ lesson_progress|get_item:lesson.id|default:0 }}%;" 
+                                                                 aria-valuenow="{{ lesson_progress|get_item:lesson.id|default:0 }}" 
+                                                                 aria-valuemin="0" aria-valuemax="100">
+                                                            </div>
+                                                        </div>
+                                                        <button class="bookmark-btn btn btn-link" 
+                                                                data-lesson-id="{{ lesson.id }}"
+                                                                title="{% if lesson.id in bookmarked_lessons %}Remove Bookmark{% else %}Bookmark{% endif %}"
+                                                                aria-label="{% if lesson.id in bookmarked_lessons %}Remove bookmark for {{ lesson.title }}{% else %}Bookmark {{ lesson.title }}{% endif %}">
+                                                            <i class="fas fa-bookmark {% if lesson.id in bookmarked_lessons %}text-success{% else %}text-muted{% endif %}"></i>
+                                                        </button>
+                                                        <span class="text-muted small">{{ lesson.duration }}</span>
+                                                    </div>
+                                                </div>
+                                            </li>
+                                            {% endfor %}
+                                        </ul>
+                                    </div>
+                                </div>
+                            </div>
+                            {% endfor %}
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="card mb-4 border-0 shadow-sm">
+                    <div class="card-body">
+                        <h3 class="card-title mb-4">Instructor</h3>
+                        <div class="d-flex align-items-center">
+                            <img src="{{ course.instructor.profile.profile_pic.url|default:'/static/images/default-instructor.jpg' }}" 
+                                 class="rounded-circle instructor-img me-4" alt="Instructor profile picture">
+                            <div>
+                                <h4>{{ course.instructor.get_full_name|default:course.instructor.username }}</h4>
+                                <p>{{ course.instructor.profile.bio|default:"Professional Trader & Educator" }}</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                {% endif %}
+            </div>
+            
+            <div class="col-lg-4">
+                <div class="course-sidebar">
+                    <div class="sidebar-card mb-4">
+                        <img src="{{ course.thumbnail.url|default:'/static/images/default-course.jpg' }}" alt="{{ course.title }} Thumbnail" class="course-thumbnail">
+                        <div class="card-body">
+                            {% if is_enrolled or course.is_free %}
+                            <span class="badge bg-success enrolled-badge w-100 text-center mb-3">
+                                <i class="fas fa-check-circle me-1"></i> {% if course.is_free %}Free Access{% else %}Enrolled{% endif %}
+                            </span>
+                            {% endif %}
+                            <a href="{{ whatsapp_link }}" class="btn whatsapp-btn btn-lg w-100 mb-3" target="_blank">
+                                <i class="fab fa-whatsapp me-2"></i> Get Support
+                            </a>
+                            <a href="{% url 'my_courses' %}" class="btn btn-outline-primary btn-lg w-100 mb-3">
+                                <i class="fas fa-tv me-2"></i> Go to My Courses
+                            </a>
+                            <ul class="list-group list-group-flush mb-3">
+                                <li class="list-group-item d-flex justify-content-between">
+                                    <span><i class="fas fa-play-circle text-primary me-2"></i> Lessons</span>
+                                    <span>{{ total_lessons }}</span>
+                                </li>
+                                <li class="list-group-item d-flex justify-content-between">
+                                    <span><i class="fas fa-clock text-primary me-2"></i> Duration</span>
+                                    <span>{{ course.duration }}</span>
+                                </li>
+                                <li class="list-group-item d-flex justify-content-between">
+                                    <span><i class="fas fa-certificate text-primary me-2"></i> Certificate</span>
+                                    <span>Included</span>
+                                </li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</main>
+
+<div class="modal fade modal-video" id="videoModal" tabindex="-1" aria-labelledby="videoModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="videoModalLabel">Video Title</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <div class="video-container">
+                    <video id="modal-video" class="video-js vjs-default-skin vjs-big-play-centered" controls preload="auto">
+                        <source src="" type="video/mp4">
+                        Your browser does not support the video tag.
+                    </video>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <div class="custom-controls">
+                    <button id="rewind-btn" title="Rewind 5 seconds">
+                        <i class="fas fa-backward"></i>
+                    </button>
+                    <button id="play-pause-btn" class="play-pause-btn" title="Play/Pause">
+                        <i class="fas fa-play"></i>
+                    </button>
+                    <button id="forward-btn" title="Forward 5 seconds">
+                        <i class="fas fa-forward"></i>
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+{% block extra_js %}
+<script src="https://vjs.zencdn.net/7.20.3/video.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const videoModalElement = document.getElementById('videoModal');
+    const videoModal = new bootstrap.Modal(videoModalElement, {
+        backdrop: 'static',
+        keyboard: false
+    });
+
+    const mainContent = document.getElementById('main-content');
+    let player = null;
+
+    videoModalElement.addEventListener('show.bs.modal', function() {
+        mainContent.setAttribute('inert', '');
+        mainContent.removeAttribute('aria-hidden');
+
+        if (player) {
+            player.dispose();
+            player = null;
+        }
+
+        const videoContainer = document.querySelector('#videoModal .video-container');
+        videoContainer.innerHTML = `
+            <video id="modal-video" class="video-js vjs-default-skin vjs-big-play-centered" controls preload="auto">
+                <source src="" type="video/mp4">
+                Your browser does not support the video tag.
+            </video>
+        `;
+
+        player = videojs('modal-video', {
+            controls: true,
+            autoplay: false,
+            preload: 'auto',
+            fluid: true,
+            errorDisplay: true
+        });
+
+        player.on('pause', function() {
+            console.log('Video paused');
+            player.muted(true);
+            const videoElement = player.el().querySelector('video');
+            if (videoElement) {
+                videoElement.pause();
+                videoElement.currentTime = videoElement.currentTime;
+            }
+        });
+
+        const playPauseBtn = document.getElementById('play-pause-btn');
+        player.on('play', function() {
+            playPauseBtn.innerHTML = '<i class="fas fa-pause"></i>';
+        });
+        player.on('pause', function() {
+            playPauseBtn.innerHTML = '<i class="fas fa-play"></i>';
+        });
+
+        const modalDialog = videoModalElement.querySelector('.modal-dialog');
+        modalDialog.setAttribute('tabindex', '-1');
+        modalDialog.focus();
+
+        const focusableElements = videoModalElement.querySelectorAll(
+            'button, [href], input, select, textarea, [tabindex]:not([tabindex="-1"])'
+        );
+        const firstFocusable = focusableElements[0];
+        const lastFocusable = focusableElements[focusableElements.length - 1];
+
+        videoModalElement.addEventListener('keydown', function(e) {
+            if (e.key === 'Tab') {
+                if (e.shiftKey) {
+                    if (document.activeElement === firstFocusable) {
+                        e.preventDefault();
+                        lastFocusable.focus();
+                    }
+                } else {
+                    if (document.activeElement === lastFocusable) {
+                        e.preventDefault();
+                        firstFocusable.focus();
+                    }
+                }
+            }
+        });
+    });
+
+    videoModalElement.addEventListener('hidden.bs.modal', function() {
+        mainContent.removeAttribute('inert');
+        mainContent.removeAttribute('aria-hidden');
+
+        if (player) {
+            player.pause();
+            player.muted(true);
+            player.src({ src: '', type: 'video/mp4' });
+            player.dispose();
+            player = null;
+        }
+
+        const activeLessonItem = document.querySelector('.lesson-item:focus') || document.activeElement.closest('.lesson-item');
+        if (activeLessonItem) {
+            activeLessonItem.focus();
+        }
+    });
+
+    const playPauseBtn = document.getElementById('play-pause-btn');
+    const forwardBtn = document.getElementById('forward-btn');
+    const rewindBtn = document.getElementById('rewind-btn');
+
+    playPauseBtn.addEventListener('click', function() {
+        if (player.paused()) {
+            player.play();
+        } else {
+            player.pause();
+        }
+    });
+
+    forwardBtn.addEventListener('click', function() {
+        const currentTime = player.currentTime();
+        player.currentTime(currentTime + 5);
+    });
+
+    rewindBtn.addEventListener('click', function() {
+        const currentTime = player.currentTime();
+        player.currentTime(Math.max(0, currentTime - 5));
+    });
+
+    const lessonItems = document.querySelectorAll('.lesson-item');
+    lessonItems.forEach(item => {
+        const playVideo = function() {
+            const videoUrl = item.getAttribute('data-video-url');
+            const lessonId = item.getAttribute('data-lesson-id');
+            const isEnrolled = item.getAttribute('data-is-enrolled') === 'true';
+            const title = item.getAttribute('data-title');
+
+            if (isEnrolled) {
+                if (!videoUrl || videoUrl === 'None') {
+                    Swal.fire({
+                        icon: 'error',
+                        title: 'Video Unavailable',
+                        html: 'No video source is available for this lesson. Please contact support at <a href="{{ whatsapp_link }}" target="_blank">WhatsApp</a>.',
+                    });
+                    return;
+                }
+
+                document.getElementById('videoModalLabel').textContent = title;
+                videoModal.show();
+
+                videoModalElement.addEventListener('shown.bs.modal', function() {
+                    if (player && videoUrl) {
+                        player.src({ src: videoUrl, type: 'video/mp4' });
+                        player.play().catch(error => {
+                            console.error('Video playback failed:', error);
+                            Swal.fire({
+                                icon: 'error',
+                                title: 'Playback Error',
+                                text: 'Failed to play the video: ' + error.message,
+                            });
+                        });
+
+                        player.on('timeupdate', function() {
+                            const progress = (player.currentTime() / player.duration()) * 100;
+                            if (progress > 0) {
+                                fetch('{% url 'update_progress' %}', {
+                                    method: 'POST',
+                                    headers: {
+                                        'Content-Type': 'application/x-www-form-urlencoded',
+                                        'X-CSRFToken': '{{ csrf_token }}'
+                                    },
+                                    body: `lesson_id=${lessonId}&progress=${progress}`
+                                }).then(response => response.json()).then(data => {
+                                    if (data.status === 'success') {
+                                        const progressBar = item.querySelector('.progress-bar');
+                                        progressBar.style.width = `${data.progress}%`;
+                                        progressBar.setAttribute('aria-valuenow', data.progress);
+                                    }
+                                });
+                            }
+                        });
+
+                        player.on('error', function() {
+                            console.error('Video.js error:', player.error());
+                            Swal.fire({
+                                icon: 'error',
+                                title: 'Video Error',
+                                text: 'An error occurred while loading the video: ' + (player.error().message || 'Unknown error'),
+                            });
+                        });
+                    } else {
+                        console.error('Player not initialized or video URL missing');
+                        Swal.fire({
+                            icon: 'error',
+                            title: 'Error',
+                            text: 'Unable to initialize video player.',
+                        });
+                    }
+                }, { once: true });
+            }
+        };
+
+        item.addEventListener('click', playVideo);
+        item.addEventListener('keypress', function(e) {
+            if (e.key === 'Enter' || e.key === ' ') {
+                e.preventDefault();
+                playVideo();
+            }
+        });
+    });
+
+    const bookmarkButtons = document.querySelectorAll('.bookmark-btn');
+    bookmarkButtons.forEach(button => {
+        button.addEventListener('click', function(e) {
+            e.stopPropagation();
+            const lessonId = this.getAttribute('data-lesson-id');
+            fetch('{% url 'toggle_bookmark' 0 %}'.replace('0', lessonId), {
+                method: 'GET',
+                headers: {
+                    'X-CSRFToken': '{{ csrf_token }}'
+                }
+            }).then(() => location.reload());
+        });
+    });
+});
+</script>
+{% endblock extra_js %}
+{% endblock content %}

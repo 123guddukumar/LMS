@@ -1,0 +1,131 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Trading Courses - TradingPro Academy{% endblock %}
+
+{% block extra_css %}
+<style>
+    .course-card {
+        transition: transform 0.3s ease, box-shadow 0.3s ease;
+        border: none;
+        border-radius: 10px;
+        overflow: hidden;
+        height: 100%;
+    }
+    
+    .course-card:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 10px 20px rgba(0, 0, 0, 0.1);
+    }
+    
+    .course-img {
+        height: 200px;
+        object-fit: cover;
+        width: 100%;
+    }
+    
+    .badge-tag {
+        position: absolute;
+        top: 10px;
+        right: 10px;
+        font-size: 0.8rem;
+        padding: 5px 10px;
+    }
+    
+    .price-tag {
+        font-size: 1.2rem;
+        font-weight: bold;
+    }
+    
+    .original-price {
+        text-decoration: line-through;
+        color: #6c757d;
+    }
+    
+    .search-box {
+        max-width: 600px;
+        margin: 0 auto 30px;
+    }
+    
+    .empty-state {
+        padding: 50px 0;
+        text-align: center;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="container py-5">
+    <!-- Hero Section -->
+    <div class="text-center mb-5">
+        <h1 class="display-5 fw-bold mb-3">Browse Our Trading Courses</h1>
+        <p class="lead mb-4">Learn professional trading strategies from market experts</p>
+        
+        <div class="search-box">
+            <form method="GET" action="{% url 'course_list' %}">
+                <div class="input-group">
+                    <input type="text" name="q" class="form-control form-control-lg" 
+                           placeholder="Search courses by title..." value="{{ query }}">
+                    <button class="btn btn-primary" type="submit">
+                        <i class="fas fa-search"></i> Search
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+    
+    <!-- Courses List -->
+    {% if courses %}
+    <div class="row row-cols-1 row-cols-md-2 row-cols-lg-3 g-4">
+        {% for course in courses %}
+        <div class="col">
+            <div class="card course-card">
+                {% if course.is_free %}
+                <span class="badge bg-success badge-tag">FREE</span>
+                {% elif course.discount_price %}
+                <span class="badge bg-danger badge-tag">SALE</span>
+                {% endif %}
+                
+                <img src="{{ course.thumbnail.url }}" class="course-img" alt="{{ course.title }}">
+                
+                <div class="card-body">
+                    <span class="badge bg-light text-dark mb-2">{{ course.category }}</span>
+                    <h5 class="card-title">{{ course.title }}</h5>
+                    <p class="card-text text-muted">{{ course.description|truncatewords:20 }}</p>
+                </div>
+                
+                <div class="card-footer bg-white">
+                    <div class="d-flex justify-content-between align-items-center">
+                        {% if course.is_free %}
+                        <span class="price-tag text-success">Free</span>
+                        {% else %}
+                        <div>
+                            {% if course.discount_price %}
+                            <span class="price-tag text-primary">${{ course.discount_price }}</span>
+                            <span class="original-price small ms-2">${{ course.price }}</span>
+                            {% else %}
+                            <span class="price-tag text-primary">${{ course.price }}</span>
+                            {% endif %}
+                        </div>
+                        {% endif %}
+                        <a href="{% url 'course_detail' course.pk %}" class="btn btn-sm btn-outline-primary">View Details</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+    {% else %}
+    <div class="empty-state">
+        <div class="mb-4">
+            <i class="fas fa-book-open fa-4x text-muted"></i>
+        </div>
+        <h4>No courses found</h4>
+        <p class="text-muted mb-4">{% if query %}No results for "{{ query }}"{% else %}No courses available yet{% endif %}</p>
+        {% if query %}
+        <a href="{% url 'course_list' %}" class="btn btn-primary">View All Courses</a>
+        {% endif %}
+    </div>
+    {% endif %}
+</div>
+{% endblock %}

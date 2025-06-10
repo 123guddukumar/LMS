@@ -1,0 +1,29 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Course Download Links</title>
+</head>
+<body style="font-family: Arial, sans-serif; line-height: 1.6; color: #333;">
+    <div style="max-width: 600px; margin: 0 auto; padding: 20px;">
+        <h2 style="color: #0d6efd;">Download Links for {{ course.title }}</h2>
+        <p>Dear {{ user.get_full_name|default:user.username }},</p>
+        <p>Thank you for enrolling in <strong>{{ course.title }}</strong>. Below are the download links for the course videos:</p>
+        
+        <ul style="list-style: none; padding: 0;">
+            {% for link in download_links %}
+            <li style="margin-bottom: 10px;">
+                <a href="{{ link.url }}" style="color: #0d6efd; text-decoration: none;">
+                    {{ link.title }}
+                </a>
+            </li>
+            {% endfor %}
+        </ul>
+        
+        <p><strong>Note:</strong> These links are valid for 1 hour. Please download the videos promptly.</p>
+        
+        <p>If you face any issues, contact us via <a href="{{ whatsapp_link }}" style="color: #25D366;">WhatsApp</a>.</p>
+        
+        <p>Best regards,<br>TradingPro Academy Team</p>
+    </div>
+</body>
+</html>

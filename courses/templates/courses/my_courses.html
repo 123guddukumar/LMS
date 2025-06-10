@@ -1,0 +1,238 @@
+{% extends 'base.html' %}
+{% load static %}
+{% load courses_tags %}
+
+
+{% block title %}My Courses - TradingPro Academy{% endblock %}
+
+{% block extra_css %}
+<style>
+    .my-courses-hero {
+        background: linear-gradient(rgba(0, 0, 0, 0.7), rgba(0, 0, 0, 0.7)), url('{% static "images/courses-bg.jpg" %}');
+        background-size: cover;
+        background-position: center;
+        color: white;
+        padding: 60px 0;
+        border-radius: 10px 10px 0 0;
+        text-align: center;
+        margin-bottom: 30px;
+    }
+    .my-courses-hero h1 {
+        font-size: 2.5rem;
+        font-weight: bold;
+    }
+    .filter-section {
+        background-color: #f8f9fa;
+        padding: 15px;
+        border-radius: 8px;
+        margin-bottom: 20px;
+    }
+    .course-card {
+        border: none;
+        border-radius: 8px;
+        box-shadow: 0 0 15px rgba(0, 0, 0, 0.1);
+        transition: transform 0.3s;
+        overflow: hidden;
+        margin-bottom: 20px;
+    }
+    .course-card:hover {
+        transform: translateY(-5px);
+    }
+    .course-card img {
+        width: 100%;
+        height: 200px;
+        object-fit: cover;
+    }
+    .course-card .card-body {
+        padding: 15px;
+    }
+    .course-card .card-title {
+        font-size: 1.2rem;
+        margin-bottom: 10px;
+    }
+    .course-card .progress {
+        height: 15px;
+        margin-bottom: 10px;
+    }
+    .course-card .progress-bar {
+        transition: width 0.3s ease-in-out;
+    }
+    .course-card .status-badge {
+        font-size: 0.8rem;
+        padding: 5px 10px;
+    }
+    .course-card .btn-resume {
+        background-color: #28a745;
+        border-color: #28a745;
+        color: white;
+    }
+    .course-card .btn-resume:hover {
+        background-color: #218838;
+        border-color: #218838;
+    }
+    .no-courses {
+        text-align: center;
+        padding: 50px 0;
+    }
+    .no-courses i {
+        font-size: 3rem;
+        color: #6c757d;
+        margin-bottom: 15px;
+    }
+    .recommended-section {
+        margin-top: 40px;
+        padding: 20px;
+        background-color: #f1f3f5;
+        border-radius: 8px;
+    }
+    .recommended-section h3 {
+        margin-bottom: 20px;
+    }
+
+    /* Responsive Design */
+    @media (max-width: 767.98px) {
+        .my-courses-hero {
+            padding: 40px 0;
+        }
+        .my-courses-hero h1 {
+            font-size: 1.8rem;
+        }
+        .filter-section {
+            padding: 10px;
+        }
+        .course-card img {
+            height: 150px;
+        }
+        .course-card .card-title {
+            font-size: 1rem;
+        }
+        .course-card .btn {
+            font-size: 0.8rem;
+        }
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<!-- My Courses Hero Section -->
+<section class="my-courses-hero">
+    <div class="container">
+        <h1>My Courses</h1>
+        <p>Explore the courses you've enrolled in and continue your learning journey.</p>
+    </div>
+</section>
+
+<div class="container">
+    <!-- Filter and Search Section -->
+    <div class="filter-section">
+        <form method="GET" class="row g-3">
+            <div class="col-md-4">
+                <input type="text" name="search" class="form-control" placeholder="Search by course title..." value="{{ search_query }}">
+            </div>
+            <div class="col-md-3">
+                <select name="status" class="form-select">
+                    <option value="">All Statuses</option>
+                    <option value="Not Started" {% if status_filter == "Not Started" %}selected{% endif %}>Not Started</option>
+                    <option value="In Progress" {% if status_filter == "In Progress" %}selected{% endif %}>In Progress</option>
+                    <option value="Completed" {% if status_filter == "Completed" %}selected{% endif %}>Completed</option>
+                </select>
+            </div>
+            <div class="col-md-3">
+                <select name="sort" class="form-select">
+                    <option value="enrollment_date" {% if sort_by == "enrollment_date" %}selected{% endif %}>Sort by Enrollment Date</option>
+                    <option value="progress" {% if sort_by == "progress" %}selected{% endif %}>Sort by Progress</option>
+                    <option value="title" {% if sort_by == "title" %}selected{% endif %}>Sort by Title</option>
+                </select>
+            </div>
+            <div class="col-md-2">
+                <button type="submit" class="btn btn-primary w-100">Apply Filters</button>
+            </div>
+        </form>
+    </div>
+
+    <!-- Courses List -->
+    <div class="row">
+        {% if courses %}
+            {% for course in courses %}
+            <div class="col-md-6 col-lg-4">
+                <div class="course-card">
+                    <a href="{% url 'course_detail' course.id %}">
+                        <img src="{{ course.thumbnail.url|default:'/static/images/default-course.jpg' }}" alt="{{ course.title }}">
+                    </a>
+                    <div class="card-body">
+                        <h5 class="card-title">
+                            <a href="{% url 'course_detail' course.id %}" class="text-decoration-none text-dark">{{ course.title }}</a>
+                        </h5>
+                        <p class="text-muted small mb-2">Instructor: {{ course.instructor.get_full_name|default:course.instructor.username }}</p>
+                        <div class="progress">
+                            <div class="progress-bar {% if course_status|get_item:course.id == 'Completed' %}bg-success{% elif course_status|get_item:course.id == 'In Progress' %}bg-info{% else %}bg-secondary{% endif %}" 
+                                 role="progressbar" 
+                                 style="width: {{ course_progress|get_item:course.id }}%;" 
+                                 aria-valuenow="{{ course_progress|get_item:course.id }}" 
+                                 aria-valuemin="0" aria-valuemax="100">
+                                {{ course_progress|get_item:course.id|floatformat:0 }}%
+                            </div>
+                        </div>
+                        <span class="badge bg-{% if course_status|get_item:course.id == 'Completed' %}success{% elif course_status|get_item:course.id == 'In Progress' %}bg-info{% else %}bg-secondary{% endif %} status-badge mb-2">
+                            {{ course_status|get_item:course.id }}
+                        </span>
+                        <div class="d-flex justify-content-between align-items-center">
+                            {% with last_lesson=last_lessons|get_item:course.id %}
+                            {% if last_lesson %}
+                            <a href="#" class="btn btn-sm btn-resume">Resume: {{ last_lesson.title }}</a>
+                            {% else %}
+                            <a href="{% url 'course_detail' course.id %}" class="btn btn-sm btn-primary">Start Course</a>
+                            {% endif %}
+                            {% endwith %}
+                            <a href="{% url 'course_detail' course.id %}" class="btn btn-sm btn-outline-primary">Details</a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            {% endfor %}
+        {% else %}
+            <div class="no-courses">
+                <i class="fas fa-book-open"></i>
+                <h4>No Courses Enrolled</h4>
+                <p>You haven't enrolled in any courses yet. Start exploring now!</p>
+                <a href="#" class="btn btn-primary">Browse Courses</a>
+            </div>
+        {% endif %}
+    </div>
+
+    <!-- Recommended Courses Section -->
+    {% if recommended_courses %}
+    <div class="recommended-section">
+        <h3>Recommended Courses</h3>
+        <div class="row">
+            {% for course in recommended_courses %}
+            <div class="col-md-6 col-lg-4">
+                <div class="course-card">
+                    <a href="#">
+                        <img src="{{ course.thumbnail.url|default:'/static/images/default-course.jpg' }}" alt="{{ course.title }}">
+                    </a>
+                    <div class="card-body">
+                        <h5 class="card-title">
+                            <a href="#" class="text-decoration-none text-dark">{{ course.title }}</a>
+                        </h5>
+                        <p class="text-muted small mb-2">Instructor: {{ course.instructor.get_full_name|default:course.instructor.username }}</p>
+                        <p class="text-muted small mb-2">Price: ${{ course.price }}</p>
+                        <a href="#" class="btn btn-sm btn-primary">Enroll Now</a>
+                    </div>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+    </div>
+    {% endif %}
+</div>
+
+{% block extra_js %}
+<script>
+// Ensure filter form submission updates the page without reloading if possible
+document.querySelector('.filter-section form').addEventListener('submit', function(e) {
+    // Optional: Add AJAX handling if you want to avoid full page reload
+});
+</script>
+{% endblock %}
+{% endblock %}
