@@ -178,3 +178,5 @@ EMAIL_PORT = 587
 EMAIL_USE_TLS = True 
 EMAIL_HOST_USER = 'rkinstitute85@gmail.com' 
 EMAIL_HOST_PASSWORD = 'hchdlojdrkwtacnx'  
+
+GEMINI_API_KEY = 'AIzaSyAkWn_14fy0_2hmAacIh3h1AQKEjyCxcgo'

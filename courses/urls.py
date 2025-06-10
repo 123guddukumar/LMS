@@ -22,4 +22,5 @@ urlpatterns = [
     path('lessons/<int:lesson_id>/toggle-bookmark/', toggle_bookmark, name='toggle_bookmark'),
     path('update-progress/', update_progress, name='update_progress'),
     path('my-courses/', my_courses, name='my_courses'),
+    # path('chat/', chat, name='chat'),
 ]

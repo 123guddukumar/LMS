@@ -17,12 +17,18 @@ from django.conf import settings
 from django.core.mail import send_mail
 from django.template.loader import render_to_string
 from django.utils.html import strip_tags
+import google.generativeai as genai
+from django.utils import timezone
 
 # Initialize Razorpay client
 client = razorpay.Client(auth=(settings.RAZORPAY_KEY_ID, settings.RAZORPAY_KEY_SECRET))
 
 # Set up logging
 logger = logging.getLogger(__name__)
+
+# Configure Gemini API
+genai.configure(api_key=settings.GEMINI_API_KEY)
+model = genai.GenerativeModel('gemini-1.5-flash')
 
 def home(request):
     return render(request, "home.html")
@@ -415,3 +421,86 @@ def update_progress(request):
             logger.error(f"Failed to update progress for lesson {lesson_id}: {str(e)}")
             return JsonResponse({'status': 'error', 'message': str(e)}, status=500)
     return JsonResponse({'status': 'error', 'message': 'Invalid request method'}, status=400)
+
+@login_required
+def chat(request):
+    # Check if the user wants to clear the chat
+    if request.GET.get('clear') == 'true':
+        request.session['chat_history'] = []
+        request.session.modified = True
+        return redirect('chat')
+
+    chat_history = request.session.get('chat_history', [])
+    error_message = None
+
+    if request.method == 'POST':
+        user_message = request.POST.get('message', '').strip()
+        if not user_message:
+            error_message = "Please enter a message."
+        else:
+            # Add user message to chat history with timestamp as string
+            current_time = timezone.now()
+            chat_history.append({
+                'sender': 'user',
+                'message': user_message,
+                'timestamp': current_time.isoformat()  # Convert to string
+            })
+
+            # Check if the user is saying "Hi", "Hii", or "Hello"
+            greeting_keywords = ['hi', 'hii', 'hello', 'hey']
+            is_greeting = any(keyword in user_message.lower() for keyword in greeting_keywords)
+            if is_greeting:
+                ai_response = "Hello! How can I assist you with trading today?"
+            else:
+                # Check if the user is asking for the AI's name
+                name_keywords = ['name', 'who are you', 'what is your name']
+                is_name_query = any(keyword in user_message.lower() for keyword in name_keywords)
+                if is_name_query:
+                    ai_response = "I am BTech Trader Guru, here to help you with trading and stock-related questions!"
+                else:
+                    # Check if the message is related to trading/stocks
+                    trading_keywords = [
+                        'trading', 'stock', 'stocks', 'invest', 'investment', 'market', 'markets',
+                        'share', 'shares', 'equity', 'portfolio', 'bull', 'bear', 'dividend',
+                        'ipo', 'etf', 'mutual fund', 'bond', 'bonds', 'option', 'options',
+                        'future', 'futures', 'forex', 'currency', 'commodity', 'commodities',
+                        'technical analysis', 'fundamental analysis', 'price', 'volume', 'trend',
+                        'strategy', 'strategies', 'risk', 'return', 'profit', 'loss', 'broker',
+                        'exchange', 'nse', 'bse', 'nasdaq', 'nyse', 'dow', 's&p', 'index'
+                    ]
+                    is_trading_related = any(keyword in user_message.lower() for keyword in trading_keywords)
+
+                    if not is_trading_related:
+                        ai_response = "Sorry, I can only assist with questions related to trading and stocks. Please ask something about trading or stocks!"
+                    else:
+                        try:
+                            # System prompt to enforce trading/stock focus and AI identity
+                            system_prompt = (
+                                "You are BTech Trader Guru, an AI assistant specialized in trading and stocks. "
+                                "Only respond to questions related to trading, stocks, investments, markets, or related financial topics. "
+                                "If the user asks about unrelated topics, politely decline to answer and remind them to ask about trading or stocks. "
+                                "Do not reveal your identity unless explicitly asked."
+                            )
+                            prompt = f"{system_prompt}\nUser: {user_message}\nAssistant:"
+                            response = model.generate_content(prompt)
+                            ai_response = response.text.strip()
+                        except Exception as e:
+                            logger.error(f"Gemini API error: {str(e)}")
+                            ai_response = "Sorry, there was an error processing your request. Please try again later."
+
+            # Add AI response to chat history with timestamp as string
+            chat_history.append({
+                'sender': 'ai',
+                'message': ai_response,
+                'timestamp': timezone.now().isoformat()  # Convert to string
+            })
+
+        # Save chat history to session
+        request.session['chat_history'] = chat_history
+        request.session.modified = True
+
+    context = {
+        'chat_history': chat_history,
+        'error_message': error_message,
+    }
+    return render(request, 'courses/chat.html', context)

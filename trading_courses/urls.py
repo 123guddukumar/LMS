@@ -27,10 +27,12 @@ from django.conf import settings
 from django.conf.urls.static import static
 from accounts import views as account_views
 from courses import views as course_views
+from courses.views import chat
 
 urlpatterns = [
     path('admin/', admin.site.urls),
     path('', course_views.home, name='home'),
+    path('chat/', chat, name='chat'),
     path('about/', course_views.about, name='about'),
     path('contact/', course_views.contact, name='contact'),
     path('courses/', include('courses.urls')),
