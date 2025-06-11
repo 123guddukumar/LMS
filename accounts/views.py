@@ -4,7 +4,7 @@ from django.contrib.auth import authenticate, login, logout
 from django.core.mail import send_mail
 from django.conf import settings
 from .forms import UserRegisterForm, ProfileUpdateForm, UserUpdateForm
-from .models import User, Profile, UserActivity, Certificate
+from .models import User, Profile, UserActivity, Certificate, ContactMessage
 from django.contrib.auth.decorators import login_required
 from courses.models import Course, Lesson, LessonProgress, Enrollment
 from django.utils import timezone
@@ -14,6 +14,14 @@ from reportlab.pdfgen import canvas
 from reportlab.lib.pagesizes import letter
 from reportlab.lib import colors
 from io import BytesIO
+import random
+import string
+
+
+def generate_otp(length=6):
+    """Generate a random OTP of specified length."""
+    characters = string.digits
+    return ''.join(random.choice(characters) for _ in range(length))
 
 def register(request):
     if request.method == 'POST':
@@ -56,6 +64,61 @@ def login_view(request):
             messages.error(request, 'Invalid username or password.')
     
     return render(request, 'accounts/login.html')
+
+def forgot_password(request):
+    if request.method == 'POST':
+        email = request.POST.get('email')
+        try:
+            user = User.objects.get(email=email)
+            # Generate a new OTP for password reset
+            user.otp = generate_otp()
+            user.save()
+
+            # Send OTP via email
+            subject = 'Password Reset OTP - BtechTrader Academy'
+            message = f'Your OTP to reset your password is: {user.otp}\n\nIf you did not request this, please ignore this email.'
+            email_from = settings.EMAIL_HOST_USER
+            recipient_list = [user.email,]
+            send_mail(subject, message, email_from, recipient_list)
+
+            messages.success(request, 'An OTP has been sent to your email to reset your password.')
+            return redirect('reset_password', user_id=user.id)
+        except User.DoesNotExist:
+            messages.error(request, 'No account found with this email address.')
+    
+    return render(request, 'accounts/forgot_password.html')
+
+def reset_password(request, user_id):
+    user = User.objects.get(id=user_id)
+    if request.method == 'POST':
+        otp = request.POST.get('otp')
+        password1 = request.POST.get('password1')
+        password2 = request.POST.get('password2')
+
+        if user.otp != otp:
+            messages.error(request, 'Invalid OTP. Please try again.')
+            return render(request, 'accounts/reset_password.html', {'user': user})
+
+        if password1 != password2:
+            messages.error(request, 'Passwords do not match.')
+            return render(request, 'accounts/reset_password.html', {'user': user})
+
+        if len(password1) < 8:
+            messages.error(request, 'Password must be at least 8 characters long.')
+            return render(request, 'accounts/reset_password.html', {'user': user})
+
+        # Update the user's password
+        user.set_password(password1)
+        user.otp = None  # Clear the OTP after successful reset
+        user.save()
+
+        # Log the activity
+        UserActivity.objects.create(user=user, action="Reset password")
+
+        messages.success(request, 'Your password has been reset successfully. Please log in with your new password.')
+        return redirect('login')
+
+    return render(request, 'accounts/reset_password.html', {'user': user})
 
 def otp_verification(request, user_id):
     user = User.objects.get(id=user_id)
@@ -241,3 +304,34 @@ def profile(request):
         'profile_completion': profile_completion,
     }
     return render(request, 'accounts/profile.html', context)
+
+
+
+def contact_view(request):
+    if request.method == 'POST':
+        name = request.POST.get('name')
+        email = request.POST.get('email')
+        subject = request.POST.get('subject')
+        message = request.POST.get('message')
+
+        # Save to database (optional)
+        ContactMessage.objects.create(
+            name=name,
+            email=email,
+            subject=subject,
+            message=message
+        )
+
+        # Optionally send an email to the admin
+        send_mail(
+            subject,
+            f"Message from {name} ({email}):\n\n{message}",
+            email,
+            ['guddukrbth0123@gmail.com'],
+            fail_silently=False,
+        )
+
+        messages.success(request, 'Your message has been sent successfully!')
+        return redirect('contact')
+
+    return render(request, 'contact.html')

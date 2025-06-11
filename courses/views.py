@@ -62,7 +62,7 @@ def course_list(request):
 @login_required
 def course_detail(request, pk):
     course = get_object_or_404(Course.objects.prefetch_related('modules__lessons'), pk=pk)
-    whatsapp_link = "https://wa.me/918084661813?text=Hi%20TradingPro%20Support,%20I%20need%20help%20with%20" + course.title.replace(' ', '%20')
+    whatsapp_link = "https://wa.me/918084661813?text=Hi%20BtechTrader%20Support,%20I%20need%20help%20with%20" + course.title.replace(' ', '%20')
     
     # Check if the user is enrolled, or if the course is free
     is_enrolled = Enrollment.objects.filter(user=request.user, course=course, is_active=True).exists()

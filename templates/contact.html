@@ -1,0 +1,444 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Contact Us - BtechTrader Academy{% endblock %}
+
+{% block extra_css %}
+<style>
+    /* General Styles */
+    body {
+        background-color: #f5f7fa;
+        font-family: 'Inter', sans-serif;
+    }
+
+    /* Hero Section */
+    .contact-hero {
+        position: relative;
+        background: linear-gradient(135deg, rgba(0, 0, 0, 0.85), rgba(0, 0, 0, 0.65)), 
+                    url('{% static "images/contact-hero-bg.jpg" %}');
+        background-size: cover;
+        background-position: center;
+        background-attachment: fixed;
+        color: #ffffff;
+        padding: 100px 0;
+        margin-bottom: 60px;
+        border-bottom-left-radius: 30px;
+        border-bottom-right-radius: 30px;
+        overflow: hidden;
+        box-shadow: 0 10px 30px rgba(0, 0, 0, 0.15);
+    }
+    .contact-hero::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background: linear-gradient(135deg, rgba(13, 110, 253, 0.2), rgba(102, 16, 242, 0.2));
+        z-index: 1;
+    }
+    .contact-hero .container {
+        position: relative;
+        z-index: 2;
+    }
+    .contact-hero h1 {
+        font-size: 3.2rem;
+        font-weight: 800;
+        line-height: 1.2;
+        margin-bottom: 20px;
+        text-shadow: 0 2px 10px rgba(0, 0, 0, 0.3);
+        animation: fadeInUp 0.6s ease-out;
+    }
+    .contact-hero p {
+        font-size: 1.2rem;
+        opacity: 0.9;
+        animation: fadeInUp 0.8s ease-out;
+    }
+
+    /* Contact Form Section */
+    .contact-form-section {
+        padding: 80px 0;
+        background-color: #ffffff;
+    }
+    .contact-form-section h2 {
+        font-size: 2.5rem;
+        font-weight: 700;
+        color: #1a1a1a;
+        margin-bottom: 20px;
+        animation: fadeIn 0.5s ease-out;
+    }
+    .contact-form-section p {
+        font-size: 1.1rem;
+        color: #6c757d;
+        margin-bottom: 40px;
+        animation: fadeIn 0.7s ease-out;
+    }
+    .contact-form {
+        background-color: #f8f9fa;
+        padding: 40px;
+        border-radius: 15px;
+        box-shadow: 0 5px 20px rgba(0, 0, 0, 0.08);
+        animation: fadeInUp 0.6s ease-out;
+    }
+    .contact-form .form-control {
+        border-radius: 10px;
+        padding: 12px;
+        font-size: 1rem;
+        border: 1px solid #ced4da;
+        transition: border-color 0.3s ease, box-shadow 0.3s ease;
+    }
+    .contact-form .form-control:focus {
+        border-color: #0d6efd;
+        box-shadow: 0 0 5px rgba(13, 110, 253, 0.3);
+    }
+    .contact-form .btn {
+        padding: 12px 30px;
+        font-size: 1.1rem;
+        font-weight: 600;
+        border-radius: 25px;
+        background-color: #0d6efd;
+        color: #ffffff;
+        transition: transform 0.3s ease, background-color 0.3s ease;
+    }
+    .contact-form .btn:hover {
+        background-color: #0056b3;
+        transform: translateY(-3px);
+        box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+    }
+
+    /* Contact Info Section */
+    .contact-info-section {
+        padding: 80px 0;
+        background-color: #f8f9fa;
+    }
+    .contact-info-section h2 {
+        font-size: 2.5rem;
+        font-weight: 700;
+        color: #1a1a1a;
+        margin-bottom: 50px;
+        animation: fadeIn 0.5s ease-out;
+    }
+    .info-card {
+        border: none;
+        border-radius: 15px;
+        box-shadow: 0 5px 20px rgba(0, 0, 0, 0.08);
+        padding: 30px;
+        background-color: #ffffff;
+        transition: transform 0.3s ease, box-shadow 0.3s ease;
+        animation: fadeInUp 0.6s ease-out;
+    }
+    .info-card:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 10px 30px rgba(0, 0, 0, 0.12);
+    }
+    .info-icon {
+        font-size: 2.5rem;
+        color: #0d6efd;
+        margin-bottom: 20px;
+        transition: color 0.3s ease;
+    }
+    .info-card:hover .info-icon {
+        color: #0056b3;
+    }
+    .info-card h3 {
+        font-size: 1.5rem;
+        font-weight: 600;
+        color: #1a1a1a;
+        margin-bottom: 15px;
+    }
+    .info-card p {
+        font-size: 1rem;
+        color: #6c757d;
+        margin-bottom: 0;
+    }
+    .info-card a {
+        color: #0d6efd;
+        text-decoration: none;
+        transition: color 0.3s ease;
+    }
+    .info-card a:hover {
+        color: #0056b3;
+    }
+    .social-links a {
+        font-size: 1.5rem;
+        margin: 0 10px;
+        color: #0d6efd;
+        transition: color 0.3s ease, transform 0.3s ease;
+    }
+    .social-links a:hover {
+        color: #0056b3;
+        transform: translateY(-3px);
+    }
+
+    /* Call to Action Section */
+    .cta-section {
+        background: linear-gradient(135deg, #0d6efd, #6610f2);
+        color: #ffffff;
+        padding: 80px 0;
+        position: relative;
+        overflow: hidden;
+    }
+    .cta-section::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background: url('{% static "images/cta-pattern.png" %}') repeat;
+        opacity: 0.1;
+    }
+    .cta-section .container {
+        position: relative;
+        z-index: 1;
+    }
+    .cta-section h2 {
+        font-size: 2.5rem;
+        font-weight: 700;
+        margin-bottom: 20px;
+        animation: fadeIn 0.5s ease-out;
+    }
+    .cta-section p {
+        font-size: 1.2rem;
+        opacity: 0.9;
+        margin-bottom: 30px;
+        animation: fadeIn 0.7s ease-out;
+    }
+    .cta-section .btn {
+        padding: 12px 30px;
+        font-size: 1.1rem;
+        font-weight: 600;
+        border-radius: 25px;
+        background-color: #ffffff;
+        color: #0d6efd;
+        transition: transform 0.3s ease, background-color 0.3s ease;
+        animation: fadeIn 0.9s ease-out;
+    }
+    .cta-section .btn:hover {
+        background-color: #f1f1f1;
+        transform: translateY(-3px);
+        box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+    }
+
+    /* Animations */
+    @keyframes fadeIn {
+        from {
+            opacity: 0;
+        }
+        to {
+            opacity: 1;
+        }
+    }
+    @keyframes fadeInUp {
+        from {
+            opacity: 0;
+            transform: translateY(20px);
+        }
+        to {
+            opacity: 1;
+            transform: translateY(0);
+        }
+    }
+
+    /* Responsive Design */
+    @media (max-width: 991.98px) {
+        .contact-hero {
+            padding: 80px 0;
+            background-attachment: scroll;
+        }
+        .contact-hero h1 {
+            font-size: 2.8rem;
+        }
+        .contact-hero p {
+            font-size: 1.1rem;
+        }
+        .contact-form-section,
+        .contact-info-section,
+        .cta-section {
+            padding: 60px 0;
+        }
+        .contact-form-section h2,
+        .contact-info-section h2,
+        .cta-section h2 {
+            font-size: 2.2rem;
+        }
+        .contact-form {
+            padding: 30px;
+        }
+    }
+
+    @media (max-width: 767.98px) {
+        .contact-hero {
+            padding: 60px 0;
+            border-bottom-left-radius: 20px;
+            border-bottom-right-radius: 20px;
+        }
+        .contact-hero h1 {
+            font-size: 2.2rem;
+        }
+        .contact-hero p {
+            font-size: 1rem;
+        }
+        .contact-form-section,
+        .contact-info-section,
+        .cta-section {
+            padding: 50px 0;
+        }
+        .contact-form-section h2,
+        .contact-info-section h2,
+        .cta-section h2 {
+            font-size: 1.8rem;
+        }
+        .contact-form {
+            padding: 20px;
+        }
+        .contact-form .form-control {
+            font-size: 0.95rem;
+            padding: 10px;
+        }
+        .contact-form .btn {
+            padding: 10px 25px;
+            font-size: 1rem;
+        }
+        .info-card {
+            padding: 20px;
+        }
+        .info-card h3 {
+            font-size: 1.2rem;
+        }
+        .info-card p {
+            font-size: 0.9rem;
+        }
+        .social-links a {
+            font-size: 1.3rem;
+            margin: 0 8px;
+        }
+    }
+
+    @media (max-width: 575.98px) {
+        .contact-hero {
+            padding: 50px 0;
+        }
+        .contact-hero h1 {
+            font-size: 1.8rem;
+        }
+        .contact-hero p {
+            font-size: 0.9rem;
+        }
+        .contact-form-section,
+        .contact-info-section,
+        .cta-section {
+            padding: 40px 0;
+        }
+        .contact-form-section h2,
+        .contact-info-section h2,
+        .cta-section h2 {
+            font-size: 1.5rem;
+        }
+        .contact-form .form-control {
+            font-size: 0.9rem;
+        }
+        .info-icon {
+            font-size: 2rem;
+        }
+        .social-links a {
+            font-size: 1.2rem;
+            margin: 0 6px;
+        }
+        .cta-section .btn {
+            padding: 10px 20px;
+            font-size: 1rem;
+        }
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<!-- Hero Section -->
+<section class="contact-hero text-center">
+    <div class="container">
+        <h1 class="mb-4">Contact BtechTrader Academy</h1>
+        <p class="lead">We’re Here to Help You Succeed – Connect with Us Online!</p>
+    </div>
+</section>
+
+<!-- Contact Form Section -->
+<section class="contact-form-section">
+    <div class="container">
+        <div class="row align-items-center">
+            <div class="col-lg-6 mb-4">
+                <h2>Get in Touch</h2>
+                <p>Have questions or need assistance? Fill out the form below, and our team will respond promptly.</p>
+            </div>
+            <div class="col-lg-6 mb-4">
+                <form class="contact-form" method="post" action="{% url 'contact' %}">
+                    {% csrf_token %}
+                    <div class="mb-3">
+                        <input type="text" class="form-control" name="name" placeholder="Your Name" required>
+                    </div>
+                    <div class="mb-3">
+                        <input type="email" class="form-control" name="email" placeholder="Your Email" required>
+                    </div>
+                    <div class="mb-3">
+                        <input type="text" class="form-control" name="subject" placeholder="Subject" required>
+                    </div>
+                    <div class="mb-3">
+                        <textarea class="form-control" name="message" rows="5" placeholder="Your Message" required></textarea>
+                    </div>
+                    <button type="submit" class="btn btn-primary">Send Message</button>
+                </form>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Contact Info Section -->
+<section class="contact-info-section">
+    <div class="container">
+        <h2 class="text-center mb-5">Connect with Us Online</h2>
+        <div class="row">
+            <div class="col-md-4 mb-4">
+                <div class="info-card text-center">
+                    <div class="info-icon">
+                        <i class="fas fa-phone-alt"></i>
+                    </div>
+                    <h3>Phone</h3>
+                    <p><a href="tel:+1-800-555-1234">+1-800-555-1234</a></p>
+                </div>
+            </div>
+            <div class="col-md-4 mb-4">
+                <div class="info-card text-center">
+                    <div class="info-icon">
+                        <i class="fas fa-envelope"></i>
+                    </div>
+                    <h3>Email</h3>
+                    <p><a href="mailto:support@BtechTraderacademy.com">support@BtechTraderacademy.com</a></p>
+                </div>
+            </div>
+            <div class="col-md-4 mb-4">
+                <div class="info-card text-center">
+                    <div class="info-icon">
+                        <i class="fas fa-users"></i>
+                    </div>
+                    <h3>Follow Us</h3>
+                    <div class="social-links">
+                        <a href="https://youtube.com/@btechtrader07?si=bK4QPiD0QYux_BqR" target="_blank" aria-label="YouTube"><i class="fa-brands fa-youtube"></i></a>
+                        <a href="https://t.me/+dyNpR3xkc8Y4YThl" target="_blank" aria-label="Teligram"><i class="fa-brands fa-telegram"></i></a>
+                        <a href="https://www.instagram.com/btech_trader_07?igsh=OTk2MThvMXFvbHp4" target="_blank" aria-label="Instagram"><i class="fab fa-instagram"></i></a>
+                        <a href="https://olymp.gl/Dbt73" target="_blank" aria-label="Olymp Trade"><i class="fa-solid fa-money-bill-trend-up"></i></a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Call to Action Section -->
+<section class="cta-section text-center">
+    <div class="container">
+        <h2>Join the BtechTrader Community</h2>
+        <p>Start your journey to financial mastery with our expert-led courses.</p>
+        <a href="{% url 'register' %}" class="btn btn-light btn-lg">Get Started</a>
+    </div>
+</section>
+{% endblock %}

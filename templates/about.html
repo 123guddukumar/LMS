@@ -1,0 +1,475 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}About Us - BtechTrader Academy{% endblock %}
+
+{% block extra_css %}
+<style>
+    /* General Styles */
+    body {
+        background-color: #f5f7fa;
+        font-family: 'Inter', sans-serif;
+    }
+
+    /* Hero Section */
+    .about-hero {
+        position: relative;
+        background: linear-gradient(135deg, rgba(0, 0, 0, 0.85), rgba(0, 0, 0, 0.65)), 
+                    url('{% static "images/about-hero-bg.jpg" %}');
+        background-size: cover;
+        background-position: center;
+        background-attachment: fixed;
+        color: #ffffff;
+        padding: 100px 0;
+        margin-bottom: 60px;
+        border-bottom-left-radius: 30px;
+        border-bottom-right-radius: 30px;
+        overflow: hidden;
+        box-shadow: 0 10px 30px rgba(0, 0, 0, 0.15);
+    }
+    .about-hero::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background: linear-gradient(135deg, rgba(13, 110, 253, 0.2), rgba(102, 16, 242, 0.2));
+        z-index: 1;
+    }
+    .about-hero .container {
+        position: relative;
+        z-index: 2;
+    }
+    .about-hero h1 {
+        font-size: 3.2rem;
+        font-weight: 800;
+        line-height: 1.2;
+        margin-bottom: 20px;
+        text-shadow: 0 2px 10px rgba(0, 0, 0, 0.3);
+        animation: fadeInUp 0.6s ease-out;
+    }
+    .about-hero p {
+        font-size: 1.2rem;
+        opacity: 0.9;
+        animation: fadeInUp 0.8s ease-out;
+    }
+
+    /* Mission Section */
+    .mission-section {
+        padding: 80px 0;
+        background-color: #ffffff;
+    }
+    .mission-section h2 {
+        font-size: 2.5rem;
+        font-weight: 700;
+        color: #1a1a1a;
+        margin-bottom: 20px;
+        animation: fadeIn 0.5s ease-out;
+    }
+    .mission-section p {
+        font-size: 1.1rem;
+        color: #6c757d;
+        margin-bottom: 40px;
+        animation: fadeIn 0.7s ease-out;
+    }
+    .mission-section .mission-img {
+        max-width: 100%;
+        height: auto;
+        border-radius: 15px;
+        box-shadow: 0 5px 20px rgba(0, 0, 0, 0.1);
+        animation: fadeIn 0.8s ease-out;
+    }
+
+    /* Values Section */
+    .values-section {
+        padding: 80px 0;
+        background-color: #f8f9fa;
+    }
+    .values-section h2 {
+        font-size: 2.5rem;
+        font-weight: 700;
+        color: #1a1a1a;
+        margin-bottom: 50px;
+        animation: fadeIn 0.5s ease-out;
+    }
+    .value-card {
+        border: none;
+        border-radius: 15px;
+        box-shadow: 0 5px 20px rgba(0, 0, 0, 0.08);
+        padding: 30px;
+        background-color: #ffffff;
+        transition: transform 0.3s ease, box-shadow 0.3s ease;
+        animation: fadeInUp 0.6s ease-out;
+    }
+    .value-card:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 10px 30px rgba(0, 0, 0, 0.12);
+    }
+    .value-icon {
+        font-size: 2.5rem;
+        color: #0d6efd;
+        margin-bottom: 20px;
+        transition: color 0.3s ease;
+    }
+    .value-card:hover .value-icon {
+        color: #0056b3;
+    }
+    .value-card h3 {
+        font-size: 1.5rem;
+        font-weight: 600;
+        color: #1a1a1a;
+        margin-bottom: 15px;
+    }
+    .value-card p {
+        font-size: 1rem;
+        color: #6c757d;
+    }
+
+    /* Team Section */
+    .team-section {
+        padding: 80px 0;
+        background-color: #ffffff;
+    }
+    .team-section h2 {
+        font-size: 2.5rem;
+        font-weight: 700;
+        color: #1a1a1a;
+        margin-bottom: 50px;
+        animation: fadeIn 0.5s ease-out;
+    }
+    .team-card {
+        border: none;
+        border-radius: 15px;
+        box-shadow: 0 5px 20px rgba(0, 0, 0, 0.08);
+        background-color: #ffffff;
+        transition: transform 0.3s ease, box-shadow 0.3s ease;
+        animation: fadeInUp 0.6s ease-out;
+    }
+    .team-card:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 10px 30px rgba(0, 0, 0, 0.12);
+    }
+    .team-card img {
+        width: 100%;
+        height: 200px;
+        object-fit: cover;
+        border-top-left-radius: 15px;
+        border-top-right-radius: 15px;
+    }
+    .team-card .card-body {
+        padding: 20px;
+        text-align: center;
+    }
+    .team-card h5 {
+        font-size: 1.3rem;
+        font-weight: 600;
+        color: #1a1a1a;
+        margin-bottom: 5px;
+    }
+    .team-card .role {
+        font-size: 1rem;
+        color: #0d6efd;
+        margin-bottom: 10px;
+    }
+    .team-card p {
+        font-size: 0.95rem;
+        color: #6c757d;
+    }
+
+    /* Call to Action Section */
+    .cta-section {
+        background: linear-gradient(135deg, #0d6efd, #6610f2);
+        color: #ffffff;
+        padding: 80px 0;
+        position: relative;
+        overflow: hidden;
+    }
+    .cta-section::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background: url('{% static "images/cta-pattern.png" %}') repeat;
+        opacity: 0.1;
+    }
+    .cta-section .container {
+        position: relative;
+        z-index: 1;
+    }
+    .cta-section h2 {
+        font-size: 2.5rem;
+        font-weight: 700;
+        margin-bottom: 20px;
+        animation: fadeIn 0.5s ease-out;
+    }
+    .cta-section p {
+        font-size: 1.2rem;
+        opacity: 0.9;
+        margin-bottom: 30px;
+        animation: fadeIn 0.7s ease-out;
+    }
+    .cta-section .btn {
+        padding: 12px 30px;
+        font-size: 1.1rem;
+        font-weight: 600;
+        border-radius: 25px;
+        background-color: #ffffff;
+        color: #0d6efd;
+        transition: transform 0.3s ease, background-color 0.3s ease;
+        animation: fadeIn 0.9s ease-out;
+    }
+    .cta-section .btn:hover {
+        background-color: #f1f1f1;
+        transform: translateY(-3px);
+        box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+    }
+
+    /* Animations */
+    @keyframes fadeIn {
+        from {
+            opacity: 0;
+        }
+        to {
+            opacity: 1;
+        }
+    }
+    @keyframes fadeInUp {
+        from {
+            opacity: 0;
+            transform: translateY(20px);
+        }
+        to {
+            opacity: 1;
+            transform: translateY(0);
+        }
+    }
+
+    /* Responsive Design */
+    @media (max-width: 991.98px) {
+        .about-hero {
+            padding: 80px 0;
+            background-attachment: scroll;
+        }
+        .about-hero h1 {
+            font-size: 2.8rem;
+        }
+        .about-hero p {
+            font-size: 1.1rem;
+        }
+        .mission-section,
+        .values-section,
+        .team-section,
+        .cta-section {
+            padding: 60px 0;
+        }
+        .mission-section h2,
+        .values-section h2,
+        .team-section h2,
+        .cta-section h2 {
+            font-size: 2.2rem;
+        }
+        .mission-section .mission-img {
+            margin-top: 30px;
+        }
+        .team-card img {
+            height: 180px;
+        }
+    }
+
+    @media (max-width: 767.98px) {
+        .about-hero {
+            padding: 60px 0;
+            border-bottom-left-radius: 20px;
+            border-bottom-right-radius: 20px;
+        }
+        .about-hero h1 {
+            font-size: 2.2rem;
+        }
+        .about-hero p {
+            font-size: 1rem;
+        }
+        .mission-section,
+        .values-section,
+        .team-section,
+        .cta-section {
+            padding: 50px 0;
+        }
+        .mission-section h2,
+        .values-section h2,
+        .team-section h2,
+        .cta-section h2 {
+            font-size: 1.8rem;
+        }
+        .value-card {
+            padding: 20px;
+        }
+        .value-card h3 {
+            font-size: 1.2rem;
+        }
+        .value-card p {
+            font-size: 0.9rem;
+        }
+        .team-card img {
+            height: 160px;
+        }
+        .team-card h5 {
+            font-size: 1.2rem;
+        }
+        .team-card .role {
+            font-size: 0.9rem;
+        }
+        .team-card p {
+            font-size: 0.85rem;
+        }
+    }
+
+    @media (max-width: 575.98px) {
+        .about-hero {
+            padding: 50px 0;
+        }
+        .about-hero h1 {
+            font-size: 1.8rem;
+        }
+        .about-hero p {
+            font-size: 0.9rem;
+        }
+        .mission-section,
+        .values-section,
+        .team-section,
+        .cta-section {
+            padding: 40px 0;
+        }
+        .mission-section h2,
+        .values-section h2,
+        .team-section h2,
+        .cta-section h2 {
+            font-size: 1.5rem;
+        }
+        .mission-section p {
+            font-size: 1rem;
+        }
+        .value-icon {
+            font-size: 2rem;
+        }
+        .team-card img {
+            height: 140px;
+        }
+        .cta-section .btn {
+            padding: 10px 20px;
+            font-size: 1rem;
+        }
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<!-- Hero Section -->
+<section class="about-hero text-center">
+    <div class="container">
+        <h1 class="mb-4">About BtechTrader Academy</h1>
+        <p class="lead">Empowering Wealth Creation – Your Path to Financial Mastery</p>
+    </div>
+</section>
+
+<!-- Mission Section -->
+<section class="mission-section">
+    <div class="container">
+        <div class="row align-items-center">
+            <div class="col-lg-6 mb-4">
+                <h2>Our Mission</h2>
+                <p>At BtechTrader Academy, we’re dedicated to empowering individuals with the knowledge and skills needed to succeed in the financial markets. Our mission is to provide accessible, high-quality trading education that transforms beginners into confident, profitable traders.</p>
+            </div>
+            <div class="col-lg-6 mb-4">
+                <img src="https://images.herzindagi.info/image/2024/Feb/stock-market-courses-online.jpg" class="mission-img" alt="Our Mission">
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Values Section -->
+<section class="values-section">
+    <div class="container">
+        <h2 class="text-center mb-5">Our Core Values</h2>
+        <div class="row">
+            <div class="col-md-4 mb-4">
+                <div class="value-card text-center">
+                    <div class="value-icon">
+                        <i class="fas fa-book-open"></i>
+                    </div>
+                    <h3>Education First</h3>
+                    <p>We prioritize delivering comprehensive, actionable trading education to all our students.</p>
+                </div>
+            </div>
+            <div class="col-md-4 mb-4">
+                <div class="value-card text-center">
+                    <div class="value-icon">
+                        <i class="fas fa-users"></i>
+                    </div>
+                    <h3>Community Driven</h3>
+                    <p>We foster a supportive community where traders can learn, grow, and succeed together.</p>
+                </div>
+            </div>
+            <div class="col-md-4 mb-4">
+                <div class="value-card text-center">
+                    <div class="value-icon">
+                        <i class="fas fa-star"></i>
+                    </div>
+                    <h3>Excellence Always</h3>
+                    <p>We strive for excellence in everything we do, from course content to student support.</p>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Team Section -->
+<section class="team-section">
+    <div class="container">
+        <h2 class="text-center mb-5">Meet Our Expert Teachers</h2>
+        <div class="row">
+            <div class="col-md-4 mb-4">
+                <div class="team-card">
+                    <img src="{% static 'images/me.jpg' %}" alt="">
+                    <div class="card-body">
+                        <h5>Shubham Kumar</h5>
+                        <div class="role">Senior Trading Instructor</div>
+                        <p>With over 2 years of trading experience, John specializes in technical analysis and has mentored thousands of students to achieve consistent profitability.</p>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-4 mb-4">
+                <div class="team-card">
+                    <img src="{% static 'images/me.jpg' %}" alt="Jane Smith">
+                    <div class="card-body">
+                        <h5>Shubh Sharma</h5>
+                        <div class="role">Risk Management Expert</div>
+                        <p>Jane has 1 years of expertise in risk management and develops courses that help traders protect their capital while maximizing returns.</p>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-4 mb-4">
+                <div class="team-card">
+                    <img src="{% static 'images/me.jpg' %}" alt="Mike Johnson">
+                    <div class="card-body">
+                        <h5>Riya Verma</h5>
+                        <div class="role">Market Analysis Specialist</div>
+                        <p>Mike brings 1 years of market analysis experience, teaching students how to interpret charts and make data-driven trading decisions.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Call to Action Section -->
+<section class="cta-section text-center">
+    <div class="container">
+        <h2>Join the BtechTrader Community</h2>
+        <p>Start your journey to financial mastery with our expert-led courses.</p>
+        <a href="{% url 'register' %}" class="btn btn-light btn-lg">Get Started</a>
+    </div>
+</section>
+{% endblock %}

@@ -3,7 +3,7 @@
 {% load crispy_forms_tags %}
 {% load static %}
 
-{% block title %}Profile - TradingPro Academy{% endblock %}
+{% block title %}Profile - BtechTrader Academy{% endblock %}
 
 {% block extra_css %}
 <style>
@@ -392,10 +392,10 @@
 <script>
 function shareProfile() {
     const url = window.location.href;
-    const shareText = `Check out my profile on TradingPro Academy! ${url}`;
+    const shareText = `Check out my profile on BtechTrader Academy! ${url}`;
     if (navigator.share) {
         navigator.share({
-            title: 'My Profile - TradingPro Academy',
+            title: 'My Profile - BtechTrader Academy',
             text: shareText,
             url: url,
         }).catch(err => console.error('Share failed:', err));
