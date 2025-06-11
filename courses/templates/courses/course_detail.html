@@ -7,141 +7,391 @@
 {% block extra_css %}
 <link href="https://vjs.zencdn.net/7.20.3/video-js.css" rel="stylesheet" />
 <style>
+    /* General Styles */
+    body {
+        background-color: #f5f7fa;
+        font-family: 'Inter', sans-serif;
+    }
+
+    /* Course Hero Section */
     .course-hero {
-        background: linear-gradient(rgba(0, 0, 0, 0.7), rgba(0, 0, 0, 0.7)), url('{% if course.thumbnail %}{{ course.thumbnail.url }}{% else %}{% static "images/course-detail-bg.jpg" %}{% endif %}');
+        position: relative;
+        background: linear-gradient(135deg, rgba(0, 0, 0, 0.85), rgba(0, 0, 0, 0.65)), 
+                    url('{% if course.thumbnail %}{{ course.thumbnail.url }}{% else %}{% static "images/course-detail-bg.jpg" %}{% endif %}');
         background-size: cover;
         background-position: center;
-        color: white;
-        padding: 80px 0 40px;
+        color: #ffffff;
+        padding: 100px 0 60px;
         margin-bottom: 40px;
-    }
-    .course-sidebar {
-        position: sticky;
-        top: 20px;
-    }
-    .sidebar-card {
-        border: none;
-        box-shadow: 0 0 20px rgba(0, 0, 0, 0.1);
-        border-radius: 10px;
+        border-bottom-left-radius: 30px;
+        border-bottom-right-radius: 30px;
         overflow: hidden;
+        box-shadow: 0 10px 30px rgba(0, 0, 0, 0.15);
     }
-    .price-tag {
-        font-size: 2rem;
-        font-weight: bold;
+    .course-hero::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background: linear-gradient(135deg, rgba(13, 110, 253, 0.2), rgba(102, 16, 242, 0.2));
+        z-index: 1;
     }
-    .original-price {
-        text-decoration: line-through;
-        color: #6c757d;
+    .course-hero .container {
+        position: relative;
+        z-index: 2;
     }
-    .module-item {
-        border-left: 3px solid #0d6efd;
-        transition: all 0.3s;
+    .course-hero h1 {
+        font-size: 2.8rem;
+        font-weight: 800;
+        line-height: 1.2;
+        margin-bottom: 20px;
+        text-shadow: 0 2px 10px rgba(0, 0, 0, 0.3);
+        animation: fadeInUp 0.6s ease-out;
     }
-    .module-item:hover {
-        background-color: #f8f9fa;
+    .course-hero .lead {
+        font-size: 1.2rem;
+        opacity: 0.9;
+        margin-bottom: 25px;
+        animation: fadeInUp 0.8s ease-out;
     }
-    .lesson-item {
-        padding-left: 30px;
-        border-left: 2px solid #dee2e6;
-        transition: all 0.3s;
+    .course-hero .stats {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 20px;
+        margin-bottom: 30px;
+        animation: fadeInUp 1s ease-out;
+    }
+    .course-hero .stats div {
+        display: flex;
+        align-items: center;
+        font-size: 1rem;
+        font-weight: 500;
+    }
+    .course-hero .stats i {
+        margin-right: 8px;
+        color: #0d6efd;
+    }
+    .course-hero .progress {
+        height: 8px;
+        border-radius: 5px;
+        background-color: rgba(255, 255, 255, 0.2);
+        max-width: 400px;
+        margin-bottom: 25px;
+        animation: fadeInUp 1.2s ease-out;
+    }
+    .course-hero .progress-bar {
+        background-color: #28a745;
+        transition: width 0.5s ease-in-out;
+    }
+    .course-hero .btn {
+        padding: 12px 30px;
+        font-size: 1.1rem;
+        font-weight: 600;
+        border-radius: 25px;
+        transition: transform 0.3s ease, background-color 0.3s ease;
+        animation: fadeInUp 1.4s ease-out;
+    }
+    .course-hero .btn:hover {
+        transform: translateY(-3px);
+        box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+    }
+    .course-hero .btn-resume {
+        background-color: #28a745;
+        border-color: #28a745;
+    }
+    .course-hero .btn-resume:hover {
+        background-color: #218838;
+        border-color: #218838;
+    }
+    .course-hero .whatsapp-btn {
+        background-color: #25D366;
+        border-color: #25D366;
+    }
+    .course-hero .whatsapp-btn:hover {
+        background-color: #128C7E;
+        border-color: #128C7E;
+    }
+    .course-hero .enrolled-badge {
+        background-color: #28a745;
+        padding: 8px 15px;
+        border-radius: 20px;
+        font-weight: 600;
+        font-size: 0.95rem;
+        animation: fadeInUp 1.2s ease-out;
+    }
+
+    /* Main Content */
+    main {
+        padding-bottom: 60px;
+    }
+    .card {
+        border: none;
+        border-radius: 15px;
+        box-shadow: 0 5px 20px rgba(0, 0, 0, 0.08);
+        transition: transform 0.3s ease, box-shadow 0.3s ease;
+        margin-bottom: 30px;
+    }
+    .card:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 10px 30px rgba(0, 0, 0, 0.12);
+    }
+    .card-title {
+        font-size: 1.6rem;
+        font-weight: 700;
+        color: #1a1a1a;
+        margin-bottom: 25px;
+    }
+
+    /* Course Content */
+    .accordion-item {
+        border: none;
+        border-radius: 10px;
+        margin-bottom: 15px;
+        background-color: #ffffff;
+        box-shadow: 0 3px 15px rgba(0, 0, 0, 0.05);
+        transition: all 0.3s ease;
+    }
+    .accordion-item:hover {
+        box-shadow: 0 5px 20px rgba(0, 0, 0, 0.1);
+    }
+    .accordion-button {
+        padding: 20px;
+        font-size: 1.1rem;
+        font-weight: 600;
+        color: #1a1a1a;
+        background-color: transparent;
+        border: none;
+        border-radius: 10px !important;
+        transition: background-color 0.3s ease, color 0.3s ease;
+    }
+    .accordion-button:not(.collapsed) {
+        background-color: rgba(13, 110, 253, 0.05);
+        color: #0d6efd;
+        box-shadow: none;
+    }
+    .accordion-button:focus {
+        box-shadow: none;
+        outline: none;
+    }
+    .accordion-button i {
+        margin-right: 10px;
+        color: #0d6efd;
+    }
+    .accordion-body {
+        padding: 0;
+    }
+    .list-group-item {
+        border: none;
+        padding: 15px 20px;
+        border-left: 3px solid transparent;
+        transition: all 0.3s ease;
         cursor: pointer;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
     }
-    .lesson-item:hover {
+    .list-group-item:hover {
         background-color: #f8f9fa;
+        border-left-color: #0d6efd;
     }
-    .instructor-img {
+    .list-group-item i {
+        margin-right: 10px;
+        color: #0d6efd;
+    }
+    .list-group-item .badge {
+        font-size: 0.85rem;
+        padding: 5px 10px;
+        border-radius: 20px;
+    }
+    .list-group-item .progress {
+        width: 100px;
+        height: 6px;
+        border-radius: 5px;
+        background-color: #e9ecef;
+    }
+    .list-group-item .progress-bar {
+        background-color: #28a745;
+    }
+    .bookmark-btn {
+        background: none;
+        border: none;
+        padding: 5px;
+        color: #6c757d;
+        transition: color 0.3s ease;
+    }
+    .bookmark-btn:hover {
+        color: #28a745;
+    }
+    .bookmark-btn i.text-success {
+        color: #28a745 !important;
+    }
+
+    /* Instructor Section */
+    .instructor-card .instructor-img {
         width: 80px;
         height: 80px;
         object-fit: cover;
+        border-radius: 50%;
+        border: 3px solid #0d6efd;
+        margin-right: 20px;
+        box-shadow: 0 3px 10px rgba(0, 0, 0, 0.1);
     }
-    .accordion-button:not(.collapsed) {
-        background-color: rgba(13, 110, 253, 0.1);
+    .instructor-card h4 {
+        font-size: 1.3rem;
+        font-weight: 700;
+        color: #1a1a1a;
+        margin-bottom: 5px;
+    }
+    .instructor-card p {
+        font-size: 1rem;
+        color: #6c757d;
+        margin-bottom: 0;
+    }
+
+    /* Sidebar */
+    .course-sidebar {
+        position: sticky;
+        top: 80px;
+        z-index: 1;
+    }
+    .sidebar-card {
+        border: none;
+        border-radius: 15px;
+        box-shadow: 0 5px 20px rgba(0, 0, 0, 0.08);
+        background-color: #ffffff;
+        overflow: hidden;
+        transition: transform 0.3s ease;
+    }
+    .sidebar-card:hover {
+        transform: translateY(-5px);
+    }
+    .course-thumbnail {
+        width: 100%;
+        height: 200px;
+        object-fit: cover;
+        border-top-left-radius: 15px;
+        border-top-right-radius: 15px;
+    }
+    .sidebar-card .card-body {
+        padding: 25px;
+    }
+    .sidebar-card .btn {
+        padding: 12px;
+        font-size: 1rem;
+        font-weight: 600;
+        border-radius: 25px;
+        margin-bottom: 15px;
+        transition: transform 0.3s ease;
+    }
+    .sidebar-card .btn:hover {
+        transform: translateY(-3px);
+    }
+    .sidebar-card .list-group-item {
+        padding: 15px 0;
+        border: none;
+        font-size: 1rem;
+        color: #1a1a1a;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+    }
+    .sidebar-card .list-group-item i {
         color: #0d6efd;
+        margin-right: 10px;
     }
-    .video-container {
+
+    /* Not Enrolled Alert */
+    .alert {
+        border-radius: 15px;
+        padding: 25px;
+        text-align: center;
+        box-shadow: 0 5px 20px rgba(0, 0, 0, 0.08);
+    }
+    .alert .alert-heading {
+        font-size: 1.8rem;
+        font-weight: 700;
+        margin-bottom: 15px;
+    }
+    .alert p {
+        font-size: 1.1rem;
+        margin-bottom: 20px;
+    }
+    .alert .btn {
+        padding: 12px 30px;
+        font-size: 1.1rem;
+        font-weight: 600;
+        border-radius: 25px;
+        transition: transform 0.3s ease;
+    }
+    .alert .btn:hover {
+        transform: translateY(-3px);
+    }
+
+    /* Video Modal */
+    .modal-video .modal-dialog {
+        max-width: 900px;
+        margin: 1.75rem auto;
+    }
+    .modal-video .modal-content {
+        background-color: #000;
+        border: none;
+        border-radius: 15px;
+        overflow: hidden;
+    }
+    .modal-video .modal-header {
+        border-bottom: none;
+        color: #ffffff;
+        padding: 15px 25px;
+        background: rgba(255, 255, 255, 0.05);
+    }
+    .modal-video .modal-header .modal-title {
+        font-size: 1.3rem;
+        font-weight: 600;
+    }
+    .modal-video .modal-header .btn-close {
+        filter: invert(1);
+        background-size: 1.5em;
+    }
+    .modal-video .modal-body {
+        padding: 0;
+    }
+    .modal-video .video-container {
         position: relative;
         padding-bottom: 56.25%;
         height: 0;
         overflow: hidden;
-        margin-bottom: 20px;
     }
-    .video-container video {
+    .modal-video .video-container video {
         position: absolute;
         top: 0;
         left: 0;
         width: 100%;
         height: 100%;
     }
-    .whatsapp-btn {
-        background-color: #25D366;
-        border-color: #25D366;
-    }
-    .whatsapp-btn:hover {
-        background-color: #128C7E;
-        border-color: #128C7E;
-    }
-    .btn-resume {
-        background-color: #28a745;
-        border-color: #28a745;
-    }
-    .btn-resume:hover {
-        background-color: #218838;
-        border-color: #218838;
-    }
-    .enrolled-badge {
-        font-size: 1rem;
-        padding: 8px 15px;
-    }
-    .progress-bar {
-        transition: width 0.3s ease-in-out;
-    }
-    .bookmark-btn {
-        font-size: 1.2rem;
-    }
-    .course-thumbnail {
-        width: 100%;
-        height: auto;
-        border-radius: 10px;
-        margin-bottom: 20px;
-    }
-    .modal-video .modal-dialog {
-        max-width: 800px;
-    }
-    .modal-video .modal-content {
-        background-color: #000;
-        border: none;
-        border-radius: 10px;
-    }
-    .modal-video .modal-header {
-        border-bottom: none;
-        color: white;
-        padding: 10px 20px;
-    }
-    .modal-video .modal-body {
-        padding: 0;
-    }
     .modal-video .modal-footer {
         border-top: none;
-        padding: 10px 20px;
+        padding: 15px 25px;
         display: flex;
         justify-content: center;
-        gap: 10px;
-    }
-    .modal-video .btn-close {
-        filter: invert(1);
+        gap: 15px;
+        background: rgba(255, 255, 255, 0.05);
     }
     .custom-controls {
-        background: rgba(0, 0, 0, 0.7);
-        border-radius: 5px;
-        padding: 5px 10px;
+        display: flex;
+        align-items: center;
+        background: rgba(0, 0, 0, 0.8);
+        border-radius: 25px;
+        padding: 8px 15px;
     }
     .custom-controls button {
         background: none;
         border: none;
-        color: white;
+        color: #ffffff;
         font-size: 1.2rem;
-        margin: 0 5px;
-        transition: color 0.3s;
+        margin: 0 10px;
+        transition: color 0.3s ease;
     }
     .custom-controls button:hover {
         color: #0d6efd;
@@ -150,26 +400,158 @@
         font-size: 1.5rem;
     }
 
+    /* Animations */
+    @keyframes fadeInUp {
+        from {
+            opacity: 0;
+            transform: translateY(20px);
+        }
+        to {
+            opacity: 1;
+            transform: translateY(0);
+        }
+    }
+
     /* Responsive Design */
+    @media (max-width: 991.98px) {
+        .course-hero {
+            padding: 80px 0 50px;
+        }
+        .course-hero h1 {
+            font-size: 2.2rem;
+        }
+        .course-hero .lead {
+            font-size: 1.1rem;
+        }
+        .course-hero .stats {
+            gap: 15px;
+        }
+        .course-hero .btn {
+            padding: 10px 25px;
+            font-size: 1rem;
+        }
+        .course-hero .progress {
+            max-width: 300px;
+        }
+        .course-sidebar {
+            position: static;
+            margin-top: 30px;
+        }
+        .sidebar-card .course-thumbnail {
+            height: 180px;
+        }
+    }
+
     @media (max-width: 767.98px) {
         .course-hero {
-            padding: 60px 0 30px;
+            padding: 60px 0 40px;
+            border-bottom-left-radius: 20px;
+            border-bottom-right-radius: 20px;
         }
         .course-hero h1 {
             font-size: 1.8rem;
         }
-        .price-tag {
-            font-size: 1.5rem;
+        .course-hero .lead {
+            font-size: 1rem;
         }
-        .instructor-img {
+        .course-hero .stats {
+            flex-direction: column;
+            gap: 10px;
+        }
+        .course-hero .progress {
+            max-width: 100%;
+        }
+        .course-hero .btn {
+            width: 100%;
+            margin-bottom: 10px;
+            padding: 12px;
+        }
+        .card {
+            margin-bottom: 20px;
+        }
+        .card-title {
+            font-size: 1.4rem;
+        }
+        .accordion-button {
+            padding: 15px;
+            font-size: 1rem;
+        }
+        .list-group-item {
+            padding: 12px 15px;
+            font-size: 0.95rem;
+        }
+        .list-group-item .progress {
+            width: 80px;
+        }
+        .instructor-card .instructor-img {
             width: 60px;
             height: 60px;
+            margin-right: 15px;
         }
-        .lesson-item {
-            padding-left: 15px;
+        .instructor-card h4 {
+            font-size: 1.1rem;
         }
-        .progress {
-            width: 80px !important;
+        .instructor-card p {
+            font-size: 0.9rem;
+        }
+        .modal-video .modal-dialog {
+            max-width: 100%;
+            margin: 0;
+        }
+    }
+
+    @media (max-width: 575.98px) {
+        .course-hero {
+            padding: 50px 0 30px;
+        }
+        .course-hero h1 {
+            font-size: 1.5rem;
+        }
+        .course-hero .lead {
+            font-size: 0.9rem;
+        }
+        .course-hero .stats div {
+            font-size: 0.9rem;
+        }
+        .course-hero .enrolled-badge {
+            font-size: 0.85rem;
+            padding: 6px 12px;
+        }
+        .card-title {
+            font-size: 1.2rem;
+        }
+        .accordion-button {
+            padding: 12px;
+            font-size: 0.95rem;
+        }
+        .list-group-item {
+            padding: 10px 12px;
+            font-size: 0.9rem;
+        }
+        .list-group-item i {
+            margin-right: 8px;
+        }
+        .list-group-item .progress {
+            width: 60px;
+        }
+        .sidebar-card .course-thumbnail {
+            height: 150px;
+        }
+        .sidebar-card .card-body {
+            padding: 20px;
+        }
+        .sidebar-card .list-group-item {
+            font-size: 0.9rem;
+        }
+        .alert .alert-heading {
+            font-size: 1.5rem;
+        }
+        .alert p {
+            font-size: 1rem;
+        }
+        .alert .btn {
+            padding: 10px 25px;
+            font-size: 1rem;
         }
     }
 </style>
@@ -180,37 +562,35 @@
     <div class="container">
         <div class="row align-items-center">
             <div class="col-lg-8">
-                <h1 class="display-5 fw-bold mb-3">{{ course.title }}</h1>
-                <p class="lead mb-4">{{ course.description }}</p>
-                <div class="d-flex flex-wrap align-items-center gap-3 mb-4">
-                    <div class="text-white">
-                        <i class="fas fa-clock me-1"></i> {{ course.duration }}
+                <h1 class="display-5 fw-bold">{{ course.title }}</h1>
+                <p class="lead">{{ course.description }}</p>
+                <div class="stats">
+                    <div>
+                        <i class="fas fa-clock"></i> {{ course.duration }}
                     </div>
-                    <div class="text-white">
-                        <i class="fas fa-users me-1"></i> {{ course.enrollments.count }} students
+                    <div>
+                        <i class="fas fa-users"></i> {{ course.enrollments.count }} students
                     </div>
                     {% if is_enrolled or course.is_free %}
-                    <span class="badge bg-success enrolled-badge">
+                    <span class="badge enrolled-badge">
                         <i class="fas fa-check-circle me-1"></i> {% if course.is_free %}Free Access{% else %}Enrolled{% endif %}
                     </span>
                     {% endif %}
                 </div>
                 {% if is_enrolled or course.is_free %}
-                <div class="progress mb-4" style="max-width: 500px;">
-                    <div class="progress-bar bg-success" role="progressbar" 
+                <div class="progress">
+                    <div class="progress-bar" role="progressbar" 
                          style="width: {{ course_progress }}%;" 
                          aria-valuenow="{{ course_progress }}" 
                          aria-valuemin="0" aria-valuemax="100">
                         {{ course_progress|floatformat:0 }}%
                     </div>
                 </div>
+                {% if last_lesson %}
+                <a href="#" class="btn btn-resume btn-lg me-3">Resume Learning: {{ last_lesson.title }}</a>
+                {% else %}
+                <a href="#" class="btn btn-primary btn-lg me-3">Start Course</a>
                 {% endif %}
-                {% if is_enrolled or course.is_free %}
-                    {% if last_lesson %}
-                    <a href="#" class="btn btn-resume btn-lg me-3">Resume Learning: {{ last_lesson.title }}</a>
-                    {% else %}
-                    <a href="#" class="btn btn-primary btn-lg me-3">Start Course</a>
-                    {% endif %}
                 {% endif %}
                 <a href="{{ whatsapp_link }}" class="btn whatsapp-btn btn-lg" target="_blank">
                     <i class="fab fa-whatsapp me-2"></i> Get Support
@@ -223,28 +603,29 @@
 <main class="flex-grow-1" id="main-content">
     <div class="container">
         <div class="row">
-            <div class="col-lg-8 mb-5">
+            <div class="col-lg-8">
                 {% if not is_enrolled and not course.is_free %}
-                <!-- Show not enrolled message for paid courses if not enrolled -->
-                <div class="alert alert-warning text-center">
+                <!-- Not Enrolled Message -->
+                <div class="alert alert-warning">
                     <h4 class="alert-heading">Not Enrolled</h4>
                     <p>You need to enroll in this course to access the content.</p>
                     <a href="{% url 'initiate_payment' course.id %}" class="btn btn-primary">Enroll Now</a>
                 </div>
                 {% else %}
-                <!-- Show course content for enrolled users or free courses -->
-                <div class="card mb-4 border-0 shadow-sm">
+                <!-- Course Content -->
+                <div class="card">
                     <div class="card-body">
-                        <h3 class="card-title mb-4">Course Content</h3>
+                        <h3 class="card-title">Course Content</h3>
                         <div class="accordion" id="courseAccordion">
                             {% for module in modules %}
-                            <div class="accordion-item mb-2 border-0 module-item">
+                            <div class="accordion-item module-item">
                                 <h2 class="accordion-header" id="heading{{ module.id }}">
-                                    <button class="accordion-button collapsed py-3" type="button" 
-                                            data-bs-toggle="collapse" data-bs-target="#collapse{{ module.id }}">
+                                    <button class="accordion-button collapsed" type="button" 
+                                            data-bs-toggle="collapse" data-bs-target="#collapse{{ module.id }}"
+                                            aria-expanded="false" aria-controls="collapse{{ module.id }}">
                                         <div class="d-flex justify-content-between w-100 me-3">
                                             <span>
-                                                <i class="fas fa-folder-open text-primary me-2"></i>
+                                                <i class="fas fa-folder-open"></i>
                                                 {{ module.title }}
                                             </span>
                                             <span class="text-muted small">{{ module.lessons.count }} lessons</span>
@@ -253,38 +634,38 @@
                                 </h2>
                                 <div id="collapse{{ module.id }}" class="accordion-collapse collapse" 
                                      aria-labelledby="heading{{ module.id }}" data-bs-parent="#courseAccordion">
-                                    <div class="accordion-body p-0">
+                                    <div class="accordion-body">
                                         <ul class="list-group list-group-flush">
                                             {% for lesson in module.lessons.all %}
-                                            <li class="list-group-item py-3 lesson-item" 
+                                            <li class="list-group-item lesson-item" 
                                                 data-video-url="{{ lesson.get_secure_streaming_url }}" 
                                                 data-lesson-id="{{ lesson.id }}"
-                                                data-is-enrolled="true"  <!-- Always true for free courses or enrolled users -->
+                                                data-is-enrolled="true"
                                                 data-title="{{ lesson.title }}"
                                                 tabindex="0">
                                                 <div class="d-flex justify-content-between align-items-center">
                                                     <div>
-                                                        <i class="fas fa-play-circle text-primary me-2 play-video-icon"></i>
+                                                        <i class="fas fa-play-circle play-video-icon"></i>
                                                         {{ lesson.title }}
                                                         {% if forloop.first %}
                                                         <span class="badge bg-info ms-2">Preview</span>
                                                         {% endif %}
                                                     </div>
                                                     <div class="d-flex align-items-center">
-                                                        <div class="progress me-3" style="width: 100px;">
-                                                            <div class="progress-bar bg-success" role="progressbar" 
+                                                        <div class="progress me-3">
+                                                            <div class="progress-bar" role="progressbar" 
                                                                  style="width: {{ lesson_progress|get_item:lesson.id|default:0 }}%;" 
                                                                  aria-valuenow="{{ lesson_progress|get_item:lesson.id|default:0 }}" 
                                                                  aria-valuemin="0" aria-valuemax="100">
                                                             </div>
                                                         </div>
-                                                        <button class="bookmark-btn btn btn-link" 
+                                                        <button class="bookmark-btn" 
                                                                 data-lesson-id="{{ lesson.id }}"
                                                                 title="{% if lesson.id in bookmarked_lessons %}Remove Bookmark{% else %}Bookmark{% endif %}"
                                                                 aria-label="{% if lesson.id in bookmarked_lessons %}Remove bookmark for {{ lesson.title }}{% else %}Bookmark {{ lesson.title }}{% endif %}">
                                                             <i class="fas fa-bookmark {% if lesson.id in bookmarked_lessons %}text-success{% else %}text-muted{% endif %}"></i>
                                                         </button>
-                                                        <span class="text-muted small">{{ lesson.duration }}</span>
+                                                        <span class="text-muted small ms-2">{{ lesson.duration }}</span>
                                                     </div>
                                                 </div>
                                             </li>
@@ -298,12 +679,13 @@
                     </div>
                 </div>
                 
-                <div class="card mb-4 border-0 shadow-sm">
+                <!-- Instructor Section -->
+                <div class="card instructor-card">
                     <div class="card-body">
-                        <h3 class="card-title mb-4">Instructor</h3>
+                        <h3 class="card-title">Instructor</h3>
                         <div class="d-flex align-items-center">
                             <img src="{{ course.instructor.profile.profile_pic.url|default:'/static/images/default-instructor.jpg' }}" 
-                                 class="rounded-circle instructor-img me-4" alt="Instructor profile picture">
+                                 class="instructor-img" alt="Instructor profile picture">
                             <div>
                                 <h4>{{ course.instructor.get_full_name|default:course.instructor.username }}</h4>
                                 <p>{{ course.instructor.profile.bio|default:"Professional Trader & Educator" }}</p>
@@ -316,7 +698,7 @@
             
             <div class="col-lg-4">
                 <div class="course-sidebar">
-                    <div class="sidebar-card mb-4">
+                    <div class="sidebar-card">
                         <img src="{{ course.thumbnail.url|default:'/static/images/default-course.jpg' }}" alt="{{ course.title }} Thumbnail" class="course-thumbnail">
                         <div class="card-body">
                             {% if is_enrolled or course.is_free %}
@@ -324,23 +706,23 @@
                                 <i class="fas fa-check-circle me-1"></i> {% if course.is_free %}Free Access{% else %}Enrolled{% endif %}
                             </span>
                             {% endif %}
-                            <a href="{{ whatsapp_link }}" class="btn whatsapp-btn btn-lg w-100 mb-3" target="_blank">
+                            <a href="{{ whatsapp_link }}" class="btn whatsapp-btn btn-lg w-100" target="_blank">
                                 <i class="fab fa-whatsapp me-2"></i> Get Support
                             </a>
-                            <a href="{% url 'my_courses' %}" class="btn btn-outline-primary btn-lg w-100 mb-3">
+                            <a href="{% url 'my_courses' %}" class="btn btn-outline-primary btn-lg w-100">
                                 <i class="fas fa-tv me-2"></i> Go to My Courses
                             </a>
-                            <ul class="list-group list-group-flush mb-3">
-                                <li class="list-group-item d-flex justify-content-between">
-                                    <span><i class="fas fa-play-circle text-primary me-2"></i> Lessons</span>
+                            <ul class="list-group list-group-flush">
+                                <li class="list-group-item">
+                                    <span><i class="fas fa-play-circle"></i> Lessons</span>
                                     <span>{{ total_lessons }}</span>
                                 </li>
-                                <li class="list-group-item d-flex justify-content-between">
-                                    <span><i class="fas fa-clock text-primary me-2"></i> Duration</span>
+                                <li class="list-group-item">
+                                    <span><i class="fas fa-clock"></i> Duration</span>
                                     <span>{{ course.duration }}</span>
                                 </li>
-                                <li class="list-group-item d-flex justify-content-between">
-                                    <span><i class="fas fa-certificate text-primary me-2"></i> Certificate</span>
+                                <li class="list-group-item">
+                                    <span><i class="fas fa-certificate"></i> Certificate</span>
                                     <span>Included</span>
                                 </li>
                             </ul>
@@ -352,6 +734,7 @@
     </div>
 </main>
 
+<!-- Video Modal -->
 <div class="modal fade modal-video" id="videoModal" tabindex="-1" aria-labelledby="videoModalLabel" aria-hidden="true">
     <div class="modal-dialog">
         <div class="modal-content">
